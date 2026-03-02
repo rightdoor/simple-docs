@@ -1,0 +1,78 @@
+/* 全站基础样式：定义字体加载、元素重置、默认排版与基础背景色，保证跨页面视觉一致性 */
+/* @font-face {
+  font-family: 'xxx';
+  src: url('xxx.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+} */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  /* font-family: 'xxx';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; */
+  background-color: var(--bg-container);
+  color: var(--text-body);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.icon-14 {
+  width: 14px;
+  height: 14px;
+}
+
+.icon-16 {
+  width: 16px;
+  height: 16px;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}

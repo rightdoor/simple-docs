@@ -1,0 +1,53 @@
+/* NotFoundPage 局部样式：用于 404 页面内容居中展示、卡片排版与返回首页按钮的视觉规范 */
+.simple-page {
+  min-height: calc(100vh - var(--header-height) - var(--footer-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.simple-page-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bg-container);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.simple-page-title {
+  margin: 0 0 12px;
+  font-size: 22px;
+  color: var(--text-title);
+}
+
+.simple-page-text {
+  margin: 8px 0 0;
+  color: var(--text-body);
+  line-height: 1.6;
+}
+
+.simple-page-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.simple-page-btn {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.simple-page-btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}

@@ -1,0 +1,4 @@
+/* DocsPage 局部样式：用于补充文章页头部在组件作用域内的细节间距与局部排版规则 */
+.post-header-compact {
+  margin-bottom: 24px;
+}

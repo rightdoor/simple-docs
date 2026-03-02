@@ -1,0 +1,35 @@
+/* 主体布局样式：控制应用三栏结构、内容区域宽度与内边距，并适配顶部/底部固定栏占位 */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 0;
+  margin-right: 0;
+  min-height: 100vh;
+  background-color: var(--bg-container);
+}
+
+.view {
+  max-width: var(--view-max-width, 850px);
+  margin: 0 auto;
+  padding: calc(var(--header-height) + 10px) 56px calc(var(--footer-height) + 10px);
+  background-color: var(--bg-body);
+  border-left: 1px solid var(--header-glass-border);
+  border-right: 1px solid var(--header-glass-border);
+  position: relative;
+  z-index: 90;
+  min-height: 100vh;
+}
+
+.app-container.simple-page .main-content {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.app-container.simple-page .view {
+  max-width: 720px;
+  padding: var(--header-height) 24px var(--footer-height);
+}

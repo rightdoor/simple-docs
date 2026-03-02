@@ -1,0 +1,47 @@
+{
+  "name": "simple-docs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "chart.js": "4.5.1",
+    "markdown-it": "14.1.1",
+    "markdown-it-abbr": "^2.0.0",
+    "markdown-it-anchor": "9.2.0",
+    "markdown-it-chart": "0.2.0",
+    "markdown-it-container": "^4.0.0",
+    "markdown-it-deflist": "^3.0.0",
+    "markdown-it-emoji": "^3.0.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-mathjax": "^2.0.0",
+    "markdown-it-sub": "^2.0.0",
+    "markdown-it-sup": "^2.0.0",
+    "markdown-it-table-of-contents": "1.1.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "mathjax-full": "3.2.2",
+    "mermaid": "11.12.3",
+    "prismjs": "1.30.0",
+    "simple-git": "3.32.3",
+    "v-viewer": "3.0.23",
+    "viewerjs": "1.11.7",
+    "vue": "3.5.29",
+    "vue-router": "5.0.3"
+  },
+  "devDependencies": {
+    "@iconify/vue": "^5.0.0",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "25.3.3",
+    "@types/prismjs": "^1.26.6",
+    "@vitejs/plugin-vue": "6.0.4",
+    "@vue/tsconfig": "^0.8.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1",
+    "vue-tsc": "3.2.5"
+  },
+  "packageManager": "pnpm@10.30.0+sha512.2b5753de015d480eeb88f5b5b61e0051f05b4301808a82ec8b840c9d2adf7748eb352c83f5c1593ca703ff1017295bc3fdd3119abb9686efc96b9fcb18200937"
+}

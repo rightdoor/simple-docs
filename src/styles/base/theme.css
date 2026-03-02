@@ -1,0 +1,112 @@
+/* 主题变量定义：提供亮色与暗色的颜色体系、阴影、代码配色与尺寸变量，供全局样式引用 */
+:root {
+  --toc-width: 260px;
+  --sidebar-width: 260px;
+  --header-height: 48px;
+  --footer-height: 48px;
+  
+  --primary: #3e4045;
+  --primary-light: #e8f0ff;
+  --primary-hover: #f0e8de;
+
+  --text-title: #2c2e33;
+  --text-body: #3e4045;
+  --text-secondary: #6b6f78;
+  --text-placeholder: #9499a2;
+  --text-disabled: #c0c4cc;
+
+  --bg-body: #fcf7f0;
+  --bg-container: #faf3e9;
+  --bg-hover: #f0e8de;
+  --bg-active: #e8f0ff;
+
+  --border-default: #e0dad3;
+  --border-light: #ece6df;
+
+  --header-glass-bg: rgba(252, 247, 240, 0.7);
+  --header-glass-border: rgba(224, 218, 211, 0.7);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  --code-bg: #faf4ed;
+  --code-inline-bg: rgba(51, 112, 255, 0.1);
+  --code-inline-color: #476582;
+
+  --code-line-number: #9b9fa8;
+  --code-line-bg: #f3ede6;
+
+  --code-copy-bg: rgba(0, 0, 0, 0.03);
+  --code-copy-hover: rgba(0, 0, 0, 0.06);
+  --code-copy-text: #5f6368;
+  --code-copy-success: #16a34a;
+  --code-copy-error: #dc2626;
+  --code-token-comment: #6e7781;
+  --code-token-punctuation: #24292f;
+  --code-token-boolean: #0550ae;
+  --code-token-string: #0a3069;
+  --code-token-operator: #7e4f00;
+  --code-token-keyword: #cf222e;
+  --code-token-function: #8250df;
+  --code-token-variable: #953800;
+
+  --scrollbar-track: rgba(0, 0, 0, 0.04);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.18);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.26);
+}
+
+[data-theme='dark'] {
+  --primary: #3370ff;
+  --primary-light: rgba(51, 112, 255, 0.15);
+  --primary-hover: #5a8fff;
+
+  --text-title: #eceef0;
+  --text-body: #d4d8dd;
+  --text-secondary: #9aa2b0;
+  --text-placeholder: #6e7683;
+  --text-disabled: #4f5662;
+  --text-active: #ffffff;
+
+  --bg-body: #121212;
+  --bg-container: #1a1c1e;
+  --bg-hover: #242628;
+  --bg-active: rgba(51, 112, 255, 0.25);
+
+  --border-default: #33373b;
+  --border-light: #262a2e;
+
+  --header-glass-bg: rgba(18, 18, 18, 0.7);
+  --header-glass-border: rgba(51, 55, 59, 0.7);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.8);
+
+  --code-bg: #1b1e21;
+  --code-inline-bg: rgba(51, 112, 255, 0.2);
+  --code-inline-color: #8cb4ff;
+  --code-line-number: #7b8496;
+  --code-line-bg: #22262a;
+
+  --code-copy-bg: rgba(255, 255, 255, 0.05);
+  --code-copy-hover: rgba(255, 255, 255, 0.1);
+  --code-copy-text: #b0b7c5;
+
+  --code-token-comment: #8b949e;
+  --code-token-punctuation: #d4d8dd;
+  --code-token-boolean: #79c0ff;
+  --code-token-string: #a5d6ff;
+  --code-token-operator: #f2cc60;
+  --code-token-keyword: #ff7b72;
+  --code-token-function: #d2a8ff;
+  --code-token-variable: #ffa657;
+
+  --scrollbar-track: rgba(255, 255, 255, 0.04);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.16);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.24);
+}
+
+[data-theme='dark'] .nav-item-file.active,
+[data-theme='dark'] .nav-dir.active > .nav-dir-header .nav-dir-name,
+[data-theme='dark'] .toc-nav a.active {
+  color: var(--text-active);
+}

@@ -1,0 +1,248 @@
+/* 侧边栏样式：包含移动端遮罩、文件树导航、折叠/展开交互与选中态高亮显示逻辑 */
+.sidebar-overlay {
+  display: none;
+}
+
+.menu-fab-btn {
+  display: none;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--header-glass-bg);
+  border-left: 1px solid var(--header-glass-border);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height) - var(--footer-height));
+  overflow: hidden;
+  z-index: 100;
+  transition: transform 0.2s;
+}
+
+@media (min-width: 1381px) {
+  .sidebar {
+    left: calc(50% - (var(--view-max-width, 850px) / 2) - var(--sidebar-width));
+    z-index: 80;
+    border-left: 1px solid var(--header-glass-border);
+    box-shadow: none;
+  }
+
+  .sidebar.collapsed {
+    transform: translateX(calc(var(--sidebar-width) + 2px));
+    pointer-events: none;
+  }
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 12px 16px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--header-glass-border);
+}
+
+.file-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.file-header .icon {
+  color: var(--text-placeholder);
+  flex: 0 0 16px;
+}
+
+.file-header-title {
+  flex: 1;
+}
+
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--text-placeholder);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-body);
+}
+
+@media (max-width: 768px) {
+  .sidebar-toggle-btn {
+    display: none;
+  }
+}
+
+.nav-menu {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 8px 16px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.nav-menu::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.nav-list {
+  list-style: none;
+}
+
+.nav-dir {
+  list-style: none;
+  margin: 0;
+}
+
+.nav-dir-header {
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+  font-size: 13px;
+  color: var(--text-body);
+  font-weight: 500;
+  border-radius: 6px;
+  margin: 1px 0;
+  position: relative;
+}
+
+.nav-dir-header:hover {
+  background-color: var(--bg-hover);
+}
+
+.nav-dir-toggle {
+  font-size: 10px;
+  transition: transform 0.15s;
+  color: var(--text-placeholder);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.nav-dir.expanded > .nav-dir-header > .nav-dir-toggle {
+  transform: rotate(90deg);
+}
+
+.nav-dir-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-dir-name.has-readme {
+  color: var(--text-body);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.nav-dir-name.has-readme:hover {
+  color: var(--primary);
+}
+
+.nav-dir.active > .nav-dir-header .nav-dir-name {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.nav-dir.active > .nav-dir-header {
+  background-color: var(--bg-active);
+}
+
+.nav-dir.active > .nav-dir-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  background: var(--primary);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-dir-children {
+  list-style: none;
+  padding: 0 0 0 20px;
+  margin: 0;
+}
+
+.nav-item-file {
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  margin: 1px 0;
+  position: relative;
+}
+
+.nav-item-file:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-body);
+}
+
+.nav-item-file.active {
+  background-color: var(--bg-active);
+  color: var(--primary);
+}
+
+.nav-item-file.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  background: var(--primary);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.nav-file-icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.nav-item-file.active .nav-file-icon {
+  color: var(--primary);
+}

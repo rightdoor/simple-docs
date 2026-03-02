@@ -1,0 +1,75 @@
+/* 沉浸式提示message */
+.immersive-hint {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 54px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 2205;
+  pointer-events: none;
+}
+
+.immersive-hint-card {
+  width: min(420px, calc(100vw - 32px));
+  position: relative;
+  background: var(--header-glass-bg);
+  border: 1px solid var(--header-glass-border);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-radius: 12px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.immersive-hint-close {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--header-glass-border);
+  background: transparent;
+  color: var(--text-placeholder);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.immersive-hint-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-body);
+}
+
+.immersive-hint-text {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text-body);
+  text-align: center;
+}
+
+.immersive-hint-progress {
+  height: 3px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.immersive-hint-bar {
+  height: 100%;
+  background: var(--primary);
+  transform-origin: left;
+  animation: immersiveHintDeplete 3s linear forwards;
+}
+
+@keyframes immersiveHintDeplete {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}

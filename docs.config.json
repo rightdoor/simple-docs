@@ -1,0 +1,19 @@
+{
+  "title": "",
+  "language": "",
+  "url": "",
+  "description": "",
+  "docsDirectory": "",
+  "git": {
+    "autoClone": true,
+    "repository": "https://github.com/rightdoor/pubilc-docs.git",
+    "branch": "main",
+    "timeOut": 60000,
+    "showInfo": true,
+    "edit": true
+  },
+  "homepage": "",
+  "favicon": "",
+  "defaultTheme": ""
+}
+
