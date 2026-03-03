@@ -13,8 +13,15 @@ import { getDocsConfig } from '@/docsIndex'
 
 const w = window as Window & { MathJax?: Record<string, unknown> }
 w.MathJax = {
-  options: {
-    enableMenu: false,
+  loader: {
+    paths: {
+      mathjax: '/mathjax',
+    },
+    load: ['input/tex', 'output/svg', '[tex]/noerrors'],
+    require: (src: string) => import(/* @vite-ignore */ src),
+  },
+  startup: {
+    typeset: false,
   },
   tex: {
     inlineMath: [
@@ -25,12 +32,25 @@ w.MathJax = {
       ['$$', '$$'],
       ['\\[', '\\]'],
     ],
+    processEscapes: true,
+    packages: { '[+]': ['ams', 'noerrors', 'noundefined'] },
   },
   svg: {
+    scale: 1.2,
     fontCache: 'global',
+    displayAlign: 'center',
+    displayIndent: '0',
+  },
+  options: {
+    renderActions: {},
   },
 }
-void import('mathjax-full/es5/tex-svg.js')
+const mathjaxReady = (async () => {
+  const startupUrl = '/mathjax/startup.js'
+  await import(/* @vite-ignore */ startupUrl)
+  const mj = (window as Window & { MathJax?: { startup?: { promise?: Promise<unknown> } } }).MathJax
+  await mj?.startup?.promise
+})()
 
 function stripPostHashOnBoot() {
   if (!location.hash) return
@@ -112,6 +132,7 @@ if (document.body) {
 const app = createApp(App).component('Icon', Icon).use(VueViewer)
 
 void (async () => {
+  await mathjaxReady
   const { default: router } = await import('@/router')
   app.use(router)
 

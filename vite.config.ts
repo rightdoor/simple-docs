@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { loadDocsConfigSync } from './config/docsConfig'
 import { docsFsPlugin } from './config/docsMarkdown'
+import { isMathjaxModuleId, mathjaxAssetsPlugin } from './config/viteMathjax'
 
 export default defineConfig(() => {
   const configPayload = loadDocsConfigSync(process.cwd())
@@ -15,14 +16,7 @@ export default defineConfig(() => {
         output: {
           manualChunks(id) {
             if (!id.includes('node_modules')) return
-            if (
-              id.includes(`${path.sep}mathjax-full${path.sep}`) ||
-              id.includes('/mathjax-full/') ||
-              id.includes(`${path.sep}mathjax${path.sep}`) ||
-              id.includes('/mathjax/')
-            ) {
-              return 'mathjax'
-            }
+            if (isMathjaxModuleId(id)) return 'mathjax'
             if (id.includes('mermaid')) return 'mermaid'
             if (id.includes('chart.js')) return 'chartjs'
             if (id.includes('prismjs')) return 'prismjs'
@@ -31,7 +25,7 @@ export default defineConfig(() => {
         },
       },
     },
-    plugins: [docsFsPlugin(), vue()],
+    plugins: [mathjaxAssetsPlugin(), docsFsPlugin(), vue()],
     resolve: {
       alias: {
         '@': path.resolve(process.cwd(), 'src'),

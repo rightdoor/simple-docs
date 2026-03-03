@@ -39,7 +39,6 @@ const markdownItEmojiModule = require('markdown-it-emoji') as unknown
 const markdownItFootnoteModule = require('markdown-it-footnote') as unknown
 const markdownItAnchorModule = require('markdown-it-anchor') as unknown
 const markdownItChartModule = require('markdown-it-chart') as unknown
-const markdownItMathjaxModule = require('markdown-it-mathjax') as unknown
 const markdownItTableOfContentsModule = require('markdown-it-table-of-contents') as unknown
 const markdownItTaskListsModule = require('markdown-it-task-lists') as unknown
 const markdownItSubModule = require('markdown-it-sub') as unknown
@@ -119,6 +118,45 @@ function escapeAttr(value: string) {
 
 function escapeHtml(value: string) {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
+function mathBlockPlugin(md: MarkdownIt) {
+  md.block.ruler.before('fence', 'math_block', (state, startLine, endLine, silent) => {
+    const start = state.bMarks[startLine] + state.tShift[startLine]
+    const max = state.eMarks[startLine]
+    const marker = state.src.slice(start, max).trim()
+    if (marker !== '$$') return false
+
+    let nextLine = startLine + 1
+    let found = false
+    const lines: string[] = []
+    while (nextLine < endLine) {
+      const lineStart = state.bMarks[nextLine] + state.tShift[nextLine]
+      const lineMax = state.eMarks[nextLine]
+      const line = state.src.slice(lineStart, lineMax)
+      if (line.trim() === '$$') {
+        found = true
+        break
+      }
+      lines.push(line)
+      nextLine++
+    }
+    if (!found) return false
+    if (silent) return true
+
+    state.line = nextLine + 1
+    const token = state.push('math_block', 'div', 0)
+    token.block = true
+    token.map = [startLine, state.line]
+    token.content = lines.join('\n')
+    token.attrs = [['class', 'math-block']]
+    return true
+  })
+
+  md.renderer.rules.math_block = (tokens, idx) => {
+    const content = escapeHtml(tokens[idx]?.content ?? '')
+    return `<div class="math-block">\\[\n${content}\n\\]</div>\n`
+  }
 }
 
 function normalizeLanguage(raw?: string) {
@@ -214,15 +252,6 @@ export async function compileMarkdownToHtmlFragment(
   language: string,
   assetMap?: Map<string, string>
 ) {
-  const resolvedMathjaxPlugin = (() => {
-    const plugin = resolveMarkdownItPlugin(markdownItMathjaxModule)
-    try {
-      const produced = (plugin as unknown as (opts?: unknown) => unknown)()
-      if (typeof produced === 'function') return produced as MarkdownItPlugin
-    } catch {}
-    return plugin
-  })()
-
   const md = new MarkdownIt({
     breaks: true,
     linkify: true,
@@ -245,13 +274,13 @@ export async function compileMarkdownToHtmlFragment(
       return `<div class="code-block" data-lang="${escapeAttr(langLabel)}"><span class="code-lang">${escapeAttr(langLabel)}</span><button class="code-copy" type="button" aria-label="${escapeAttr(copyAria)}">${escapeAttr(copyText)}</button><div class="code-body"><div class="code-gutter">${lineNumbers}</div><pre class="code-pre"><code class="${langClass}">${highlighted}</code></pre></div></div>`
     },
   })
+    .use(mathBlockPlugin)
     .use(resolveMarkdownItPlugin(markdownItSubModule))
     .use(resolveMarkdownItPlugin(markdownItSupModule))
     .use(resolveMarkdownItPlugin(markdownItFootnoteModule))
     .use(resolveMarkdownItPlugin(markdownItDeflistModule))
     .use(resolveMarkdownItPlugin(markdownItAbbrModule))
     .use(resolveMarkdownItPlugin(markdownItEmojiModule, 'full'))
-    .use(resolvedMathjaxPlugin)
     .use(resolveMarkdownItPlugin(markdownItChartModule))
     .use(resolveMarkdownItPlugin(markdownItTaskListsModule))
     .use(resolveMarkdownItPlugin(markdownItAnchorModule), {
