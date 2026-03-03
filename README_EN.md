@@ -20,7 +20,7 @@ A simple static documentation (Markdown -> HTML) website generator built with Vu
 
 ## To-Do
 
-- [ ] Relative path link navigation within Markdown pages
+- [x] Relative path link navigation within Markdown pages
 - [ ] Custom sorting of left menu
 - [ ] Previous/Next page navigation
 - [ ] Add file Git revision history view (?)
