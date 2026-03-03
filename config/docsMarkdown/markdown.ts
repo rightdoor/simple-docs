@@ -59,6 +59,14 @@ function stripLeadingH1(markdownBody: string, title?: string) {
 }
 
 function resolveDocLinkHref(href: string, mdPath: string, idByPath: Map<string, string>) {
+  function safeDecodeURIComponent(input: string) {
+    try {
+      return decodeURIComponent(input)
+    } catch {
+      return input
+    }
+  }
+
   const trimmed = href.trim()
   if (!trimmed) return href
   if (/^(https?:)?\/\//i.test(trimmed) || /^data:/i.test(trimmed)) return href
@@ -73,11 +81,12 @@ function resolveDocLinkHref(href: string, mdPath: string, idByPath: Map<string, 
   else if (queryIndex >= 0) cut = queryIndex
   const base = cut >= 0 ? trimmed.slice(0, cut) : trimmed
   const suffix = cut >= 0 ? trimmed.slice(cut) : ''
-  if (!/\.(md|markdown|html)$/i.test(base)) return href
+  const decodedBase = safeDecodeURIComponent(base)
+  if (!/\.(md|markdown|html)$/i.test(decodedBase)) return href
 
   const lastSlash = mdPath.lastIndexOf('/')
   const mdDir = lastSlash >= 0 ? mdPath.slice(0, lastSlash) : ''
-  const resolved = resolvePath(mdDir, base)
+  const resolved = resolvePath(mdDir, decodedBase)
   const htmlPath = /\.html$/i.test(resolved) ? resolved : markdownPathToHtmlPath(resolved)
   const id = idByPath.get(htmlPath)
   if (id) return `/post/${id}${suffix}`
@@ -118,6 +127,46 @@ function escapeAttr(value: string) {
 
 function escapeHtml(value: string) {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
+function rewriteMarkdownLinksInHtmlBlocks(markdown: string, mdPath: string, idByPath: Map<string, string>) {
+  const normalized = markdown.replace(/\r\n/g, '\n')
+  const lines = normalized.split('\n')
+  let divDepth = 0
+
+  const openDivRe = /^\s*<div\b[^>]*>\s*$/i
+  const closeDivRe = /^\s*<\/div>\s*$/i
+  const linkRe = /\[([^\]]+)\]\(([^)]+)\)/g
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? ''
+    const isOpen = openDivRe.test(line)
+    const isClose = closeDivRe.test(line)
+
+    if (divDepth > 0 && !isOpen && !isClose) {
+      lines[i] = line.replace(linkRe, (_m, rawText, rawInner) => {
+        const text = String(rawText ?? '')
+        const inner = String(rawInner ?? '').trim()
+        if (!inner) return _m
+        const titleMatch = inner.match(/^(.*?)(\s+["'][^"']*["'])$/)
+        const hrefPart = (titleMatch?.[1] ?? inner).trim()
+        const titleRaw = (titleMatch?.[2] ?? '').trim()
+        const titleValue =
+          titleRaw.length >= 2 && (titleRaw.startsWith('"') || titleRaw.startsWith("'"))
+            ? titleRaw.slice(1, -1)
+            : ''
+
+        const nextHref = resolveDocLinkHref(hrefPart, mdPath, idByPath)
+        const titleAttr = titleValue ? ` title="${escapeAttr(titleValue)}"` : ''
+        return `<a href="${escapeAttr(nextHref)}"${titleAttr}>${escapeHtml(text)}</a>`
+      })
+    }
+
+    if (isOpen) divDepth++
+    if (isClose) divDepth = Math.max(0, divDepth - 1)
+  }
+
+  return lines.join('\n')
 }
 
 function mathBlockPlugin(md: MarkdownIt) {
@@ -340,7 +389,8 @@ export async function compileMarkdownToHtmlFragment(
   const parsed = parseFrontmatter(markdown)
   const title = parsed.data.title || undefined
   const body = stripLeadingH1(parsed.body, title)
-  const processed = rewriteRelativeImageLinks(body, mdPath, assetBase, assetMap)
+  const withHtmlBlockLinks = rewriteMarkdownLinksInHtmlBlocks(body, mdPath, idByPath)
+  const processed = rewriteRelativeImageLinks(withHtmlBlockLinks, mdPath, assetBase, assetMap)
   return md.render(processed)
 }
 

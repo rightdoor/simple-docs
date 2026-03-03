@@ -9,6 +9,7 @@ import { getDocsConfig, getDocsIndex, loadDocsHtml, onDocsUpdate, resolveDocsPat
 import { buildContributorLines, buildEditUrl, buildGitItems, parseRepoName, type GitMetaItem } from './useDocsPage/git'
 import { createCodeCopyBinder } from './useDocsPage/codeCopy'
 import { createAnchorBinder } from './useDocsPage/anchors'
+import { createRouterLinkBinder } from './useDocsPage/routerLinks'
 import { createContentRenderers } from './useDocsPage/render'
 import { createActiveTocTracker } from './useDocsPage/tocActive'
 import {
@@ -71,6 +72,7 @@ export function useDocsPage() {
   let stopDocsListener: (() => void) | null = null
   const codeCopyBinder = createCodeCopyBinder(t)
   const anchorBinder = createAnchorBinder({ scrollToTocId: toc?.scrollToId })
+  const routerLinkBinder = createRouterLinkBinder(router)
   const renderers = createContentRenderers()
   const tocTracker = createActiveTocTracker({ getContainer: () => mdContainer.value, setActiveId: toc?.setActiveId })
 
@@ -79,6 +81,7 @@ export function useDocsPage() {
     toc?.setItems(buildTocItems(container))
     codeCopyBinder.bind(container)
     anchorBinder.bind(container)
+    routerLinkBinder.bind(container)
     renderers.typesetMath(container)
     renderers.renderMermaid(container)
     renderers.renderCharts(container)
@@ -279,6 +282,7 @@ export function useDocsPage() {
     stopDocsListener = null
     codeCopyBinder.cleanup()
     anchorBinder.cleanup()
+    routerLinkBinder.cleanup()
   })
 
   return {
