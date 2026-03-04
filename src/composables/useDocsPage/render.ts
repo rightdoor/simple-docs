@@ -32,13 +32,32 @@ export function createContentRenderers() {
       run?: (opts: { nodes: Element[] }) => Promise<void>
       init?: (config: unknown, nodes: Element[]) => Promise<void>
     }
+
+    const warn = console.warn
+    console.warn = (...args: unknown[]) => {
+      const first = args[0]
+      if (
+        typeof first === 'string' &&
+        first.startsWith('Do not assign mappings to elements without corresponding data')
+      ) {
+        return
+      }
+      warn(...args)
+    }
+
     if (api.run) {
-      void api.run({ nodes })
+      void api.run({ nodes }).finally(() => {
+        console.warn = warn
+      })
       return
     }
     if (api.init) {
-      void api.init(undefined, nodes)
+      void api.init(undefined, nodes).finally(() => {
+        console.warn = warn
+      })
+      return
     }
+    console.warn = warn
   }
 
   function renderCharts(container: HTMLElement) {

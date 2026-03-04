@@ -28,6 +28,8 @@ export function useDocsPage() {
   const toc = inject(tocKey)
   const { t } = useI18n()
 
+  type EdgeNavDoc = { id: string; title: string }
+
   const html = ref('')
   const title = ref('')
   const description = ref('')
@@ -46,6 +48,8 @@ export function useDocsPage() {
   const showEdit = ref(true)
   const mdContainer = ref<HTMLElement | null>(null)
   const currentDocsPath = ref('')
+  const prevDoc = ref<EdgeNavDoc | null>(null)
+  const nextDoc = ref<EdgeNavDoc | null>(null)
 
   type RenderCacheEntry = {
     html: string
@@ -76,6 +80,40 @@ export function useDocsPage() {
   const renderers = createContentRenderers()
   const tocTracker = createActiveTocTracker({ getContainer: () => mdContainer.value, setActiveId: toc?.setActiveId })
 
+  async function updatePrevNext(resolvedPath: string) {
+    let index: Awaited<ReturnType<typeof getDocsIndex>> | null = null
+    try {
+      index = await getDocsIndex()
+    } catch {
+      prevDoc.value = null
+      nextDoc.value = null
+      return
+    }
+    const files = index.files || []
+    const currentIndex = files.findIndex((f) => f.path === resolvedPath || f.id === resolvedPath)
+    if (currentIndex < 0) {
+      prevDoc.value = null
+      nextDoc.value = null
+      return
+    }
+    const prev = currentIndex > 0 ? files[currentIndex - 1] : null
+    const next = currentIndex >= 0 && currentIndex < files.length - 1 ? files[currentIndex + 1] : null
+    prevDoc.value = prev ? { id: prev.id, title: (prev.title || prev.name || prev.path).trim() } : null
+    nextDoc.value = next ? { id: next.id, title: (next.title || next.name || next.path).trim() } : null
+  }
+
+  function goPrevDoc() {
+    const p = prevDoc.value
+    if (!p) return
+    router.push(`/post/${encodeURIComponent(p.id)}`)
+  }
+
+  function goNextDoc() {
+    const n = nextDoc.value
+    if (!n) return
+    router.push(`/post/${encodeURIComponent(n.id)}`)
+  }
+
   function renderContent(container: HTMLElement, dispatchRendered: boolean) {
     decorateImages(container)
     toc?.setItems(buildTocItems(container))
@@ -99,6 +137,7 @@ export function useDocsPage() {
     const rawPath = Array.isArray(pm) ? pm.join('/') : (pm as string | undefined) || 'README.html'
     const resolvedPath = await resolveDocsPathFromRoute(rawPath)
     currentDocsPath.value = resolvedPath
+    await updatePrevNext(resolvedPath)
     const cached = renderCache.get(resolvedPath)
     if (cached) {
       html.value = cached.html
@@ -303,5 +342,9 @@ export function useDocsPage() {
     showGitInfo,
     showEdit,
     mdContainer,
+    prevDoc,
+    nextDoc,
+    goPrevDoc,
+    goNextDoc,
   }
 }

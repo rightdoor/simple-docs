@@ -2,3 +2,70 @@
 .post-header-compact {
   margin-bottom: 24px;
 }
+
+.post-pager {
+  display: none;
+  margin: 20px 0 8px;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.post-pager-btn {
+  flex: 1;
+  min-width: 0;
+  max-width: 420px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--header-glass-bg);
+  border: 1px solid var(--header-glass-border);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  color: var(--text-secondary);
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.post-pager-btn:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .post-pager-btn:not(:disabled):hover {
+    background: var(--bg-hover);
+    color: var(--text-body);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .post-pager-btn:not(:disabled):active {
+    background: var(--bg-hover);
+    color: var(--text-body);
+  }
+}
+
+.post-pager-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-pager-btn.prev .post-pager-text {
+  text-align: left;
+}
+
+.post-pager-btn.next .post-pager-text {
+  text-align: right;
+}
+
+@media (max-width: 1380px) {
+  .post-pager {
+    display: flex;
+  }
+}

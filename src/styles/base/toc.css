@@ -171,6 +171,114 @@
   transform: rotate(180deg);
 }
 
+.last-docs-btn,
+.next-docs-btn {
+  display: none;
+  position: fixed;
+  top: 85%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 40px;
+  padding: 0 6px;
+  background: var(--header-glass-bg);
+  border: 1px solid var(--header-glass-border);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  cursor: pointer;
+  z-index: 98;
+  align-items: center;
+  color: var(--text-placeholder);
+  transition: width 0.18s, color 0.15s, background 0.15s;
+  overflow: hidden;
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+}
+
+.last-docs-btn:hover,
+.next-docs-btn:hover {
+  background: var(--header-glass-bg);
+  color: var(--text-body);
+  width: var(--sidebar-width);
+}
+
+.last-docs-btn:disabled,
+.next-docs-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.last-docs-btn .icon,
+.next-docs-btn .icon {
+  flex: 0 0 16px;
+}
+
+.edge-icon-hover {
+  display: none;
+}
+
+.edge-nav-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity 0.15s;
+  text-align: left;
+}
+
+.next-docs-btn .edge-nav-text {
+  text-align: right;
+}
+
+.last-docs-btn:hover .edge-nav-text,
+.next-docs-btn:hover .edge-nav-text {
+  opacity: 1;
+}
+
+.last-docs-btn:hover .edge-icon-default,
+.next-docs-btn:hover .edge-icon-default {
+  display: none;
+}
+
+.last-docs-btn:hover .edge-icon-hover,
+.next-docs-btn:hover .edge-icon-hover {
+  display: inline-flex;
+}
+
+.last-docs-btn {
+  left: 0;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  justify-content: flex-start;
+}
+
+.next-docs-btn {
+  right: 0;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  justify-content: flex-end;
+}
+
+.last-docs-btn.show,
+.next-docs-btn.show {
+  display: flex;
+}
+
+@media (min-width: 1381px) {
+  .last-docs-btn {
+    left: max(0px, calc(50% - (var(--view-max-width, 850px) / 2)));
+    border-left: 1px solid var(--header-glass-border);
+    border-radius: 0 6px 6px 0;
+    box-shadow: var(--shadow-md);
+  }
+
+  .next-docs-btn {
+    right: max(0px, calc(50% - (var(--view-max-width, 850px) / 2)));
+    border-right: 1px solid var(--header-glass-border);
+    border-radius: 6px 0 0 6px;
+    box-shadow: var(--shadow-md);
+  }
+}
+
 .back-to-top-btn {
   position: fixed;
   bottom: calc(var(--footer-height) + 18px);

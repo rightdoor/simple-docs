@@ -19,6 +19,10 @@ const {
   showGitInfo,
   showEdit,
   mdContainer,
+  prevDoc,
+  nextDoc,
+  goPrevDoc,
+  goNextDoc,
 } = useDocsPage()
 
 void mdContainer
@@ -154,6 +158,17 @@ function syncDetailsOpen(ev: Event) {
           {{ t('docs.editThis') }}
         </span>
       </a>
+    </div>
+    <!-- 上/下一篇 -->
+    <div class="post-pager" v-if="prevDoc || nextDoc">
+      <button class="post-pager-btn prev" :disabled="!prevDoc" @click="goPrevDoc">
+        <Icon class="icon icon-16" icon="material-symbols:chevron-left" />
+        <span class="post-pager-text">{{ prevDoc?.title || '-' }}</span>
+      </button>
+      <button class="post-pager-btn next" :disabled="!nextDoc" @click="goNextDoc">
+        <span class="post-pager-text">{{ nextDoc?.title || '-' }}</span>
+        <Icon class="icon icon-16" icon="material-symbols:chevron-right" />
+      </button>
     </div>
   </article>
 </template>

@@ -40,6 +40,10 @@ const {
   openSidebarDrawer,
   backToTop,
   immersiveMode,
+  prevDoc,
+  nextDoc,
+  goPrevDoc,
+  goNextDoc,
   immersiveHintVisible,
   immersiveHintKey,
   closeImmersiveHint,
@@ -167,6 +171,30 @@ const { t } = useI18n()
       @click="expandSidebar"
     >
       <Icon class="icon icon-16" icon="material-symbols:chevron-left" />
+    </button>
+
+    <button
+      v-if="!isSimplePage"
+      class="last-docs-btn"
+      :class="{ show: isWideLayout && !immersiveMode && !!prevDoc }"
+      :disabled="!prevDoc"
+      @click="goPrevDoc"
+    >
+      <span class="edge-nav-text">{{ prevDoc?.title || '' }}</span>
+      <Icon class="icon icon-16 edge-icon-default" icon="material-symbols:chevron-right" />
+      <Icon class="icon icon-16 edge-icon-hover" icon="material-symbols:chevron-left" />
+    </button>
+
+    <button
+      v-if="!isSimplePage"
+      class="next-docs-btn"
+      :class="{ show: isWideLayout && !immersiveMode && !!nextDoc }"
+      :disabled="!nextDoc"
+      @click="goNextDoc"
+    >
+      <Icon class="icon icon-16 edge-icon-default" icon="material-symbols:chevron-left" />
+      <Icon class="icon icon-16 edge-icon-hover" icon="material-symbols:chevron-right" />
+      <span class="edge-nav-text">{{ nextDoc?.title || '' }}</span>
     </button>
 
     <button
