@@ -174,9 +174,10 @@ export function docsFsPlugin(): Plugin {
       viteCommand = resolved.command
     },
     async buildStart() {
+      const docsRoot = getDocsRoot()
       const cloneResult = await ensureAutoClone({
         docsConfig,
-        docsRoot: getDocsRoot(),
+        docsRoot,
         mode: viteCommand,
         logBuild,
       })
@@ -185,7 +186,21 @@ export function docsFsPlugin(): Plugin {
         err.stack = ''
         this.error(err)
       }
-      const yes = await isGitRepo(getDocsRoot())
+
+      if (docsConfig.git?.autoClone !== true) {
+        let st: Awaited<ReturnType<typeof fs.stat>> | null = null
+        try {
+          st = await fs.stat(docsRoot)
+        } catch {
+          st = null
+        }
+        if (!st) {
+          await fs.mkdir(docsRoot, { recursive: true })
+          logBuild('build.autoCreateDocsDir', { dir: docsConfig.docsDirectory })
+        }
+      }
+
+      const yes = await isGitRepo(docsRoot)
       logGitRepoStatus(docsConfig.docsDirectory, yes)
     },
     async transformIndexHtml(html) {

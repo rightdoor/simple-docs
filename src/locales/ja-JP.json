@@ -12,6 +12,7 @@
   "build.autoCloneRepoMatch": "[ja-JP] {dir}のリポジトリは一致しています({repo})、ブランチ: {branch}",
   "build.gitBranchMissing": "[ja-JP] git.branchが設定されていないため、自動クローンできません。",
   "build.cloneFailedOrTimeout": "[ja-JP] クローンに失敗したかタイムアウトしました。公開リポジトリか/ネットワークを確認してください。",
+  "build.autoCreateDocsDir": "[ja-JP] 対象 {dir} が存在しないため、自動作成します。",
 
   "app.search": "検索",
   "app.immersive": "没入",

@@ -12,6 +12,7 @@
   "build.autoCloneRepoMatch": "[en-US] {dir} repository matches ({repo}), branch: {branch}",
   "build.gitBranchMissing": "[en-US] git.branch is not configured. Auto clone is disabled.",
   "build.cloneFailedOrTimeout": "[en-US] Clone failed or timed out. Please check repository access or network.",
+  "build.autoCreateDocsDir": "[en-US] Target {dir} does not exist, creating it automatically.",
 
   "app.search": "Search",
   "app.immersive": "Immersive",
