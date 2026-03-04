@@ -13,6 +13,8 @@
   "build.gitBranchMissing": "[ja-JP] git.branchが設定されていないため、自動クローンできません。",
   "build.cloneFailedOrTimeout": "[ja-JP] クローンに失敗したかタイムアウトしました。公開リポジトリか/ネットワークを確認してください。",
   "build.autoCreateDocsDir": "[ja-JP] 対象 {dir} が存在しないため、自動作成します。",
+  "build.indexJsonMissingDefaultOrder": "[ja-JP] index.json が存在しないため、デフォルト順を使用します。",
+  "build.indexJsonCustomOrder": "[ja-JP] index.json が存在するため、カスタム順を使用します。",
 
   "app.search": "検索",
   "app.immersive": "没入",

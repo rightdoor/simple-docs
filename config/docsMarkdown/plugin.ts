@@ -23,6 +23,7 @@ export function docsFsPlugin(): Plugin {
   let cachedRss: string | null = null
   let rssDirty = true
   let gitRepoLogged = false
+  let indexOrderLogged: 'missing' | 'custom' | null = null
   let viteCommand: 'serve' | 'build' = 'build'
 
   function getDocsRoot() {
@@ -69,7 +70,25 @@ export function docsFsPlugin(): Plugin {
       indexDirty = false
       return cachedIndex
     }
+    let indexJsonExists = false
+    try {
+      const st = await fs.stat(path.join(docsRoot, 'index.json'))
+      indexJsonExists = st.isFile()
+    } catch {
+      indexJsonExists = false
+    }
     const payload = await buildDocsIndex(docsRoot, { includeGit: docsConfig.git?.showInfo !== false })
+    if (indexJsonExists && payload.orderSource === 'index.json') {
+      if (indexOrderLogged !== 'custom') {
+        logBuild('build.indexJsonCustomOrder')
+        indexOrderLogged = 'custom'
+      }
+    } else if (!indexJsonExists) {
+      if (indexOrderLogged !== 'missing') {
+        logBuild('build.indexJsonMissingDefaultOrder')
+        indexOrderLogged = 'missing'
+      }
+    }
     const yes = await isGitRepo(docsRoot)
     cachedIndex = { ...payload, isGitRepo: yes }
     indexDirty = false

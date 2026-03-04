@@ -105,6 +105,124 @@ function toGitInfo(entry: GitAggregateEntry | undefined, statusMap: Map<string, 
   return { lastCommit: entry.lastCommit, status, commitCount: entry.commitCount, contributors } as DocsGitInfo
 }
 
+type TreeNode = {
+  dirs: Map<string, TreeNode>
+  files: Array<{ file: DocsIndexFile; name: string }>
+}
+
+function createTreeNode(): TreeNode {
+  return { dirs: new Map(), files: [] }
+}
+
+function normalizeRelPath(p: string) {
+  return toPosix(p).replace(/^\.\//, '').replace(/^\/+/, '')
+}
+
+function buildDefaultOrderedFiles(files: DocsIndexFile[]) {
+  const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+  const root = createTreeNode()
+
+  for (const f of files) {
+    const parts = normalizeRelPath(f.path).split('/').filter(Boolean)
+    if (!parts.length) continue
+    const fileName = parts[parts.length - 1] || ''
+    const dirParts = parts.slice(0, -1)
+    let cur = root
+    for (const part of dirParts) {
+      let next = cur.dirs.get(part)
+      if (!next) {
+        next = createTreeNode()
+        cur.dirs.set(part, next)
+      }
+      cur = next
+    }
+    cur.files.push({ file: f, name: fileName })
+  }
+
+  function sortNode(node: TreeNode) {
+    for (const child of node.dirs.values()) sortNode(child)
+    node.files.sort((a, b) => collator.compare(a.name, b.name))
+    const sortedDirs = Array.from(node.dirs.entries()).sort((a, b) => collator.compare(a[0], b[0]))
+    node.dirs = new Map(sortedDirs)
+  }
+
+  sortNode(root)
+
+  const ordered: DocsIndexFile[] = []
+
+  function walk(node: TreeNode, prefix: string) {
+    for (const [dirName, child] of node.dirs.entries()) {
+      const nextPrefix = prefix ? `${prefix}/${dirName}` : dirName
+      walk(child, nextPrefix)
+    }
+    for (const { file } of node.files) {
+      ordered.push(file)
+    }
+  }
+
+  walk(root, '')
+  return ordered
+}
+
+async function readIndexJson(docsRoot: string) {
+  const filePath = path.join(docsRoot, 'index.json')
+  let st: Awaited<ReturnType<typeof fs.stat>> | null = null
+  try {
+    st = await fs.stat(filePath)
+  } catch {
+    st = null
+  }
+  if (!st || !st.isFile()) return null
+  const raw = await fs.readFile(filePath, 'utf8')
+  return JSON.parse(raw) as unknown
+}
+
+function applyIndexJsonOrder(files: DocsIndexFile[], rawIndexJson: unknown) {
+  if (!Array.isArray(rawIndexJson)) throw new Error('index.json root is not array')
+  const expected = new Set(files.map((f) => normalizeRelPath(f.path)))
+  const byPath = new Map(files.map((f) => [normalizeRelPath(f.path), f] as const))
+  const used = new Set<string>()
+  const ordered: DocsIndexFile[] = []
+  const dirTitles: Record<string, string> = {}
+
+  function toHtmlPathFromIndexRef(rel: string) {
+    const normalized = normalizeRelPath(rel)
+    return markdownPathToHtmlPath(normalized)
+  }
+
+  function visit(entry: unknown, prefixDir: string) {
+    if (typeof entry === 'string') {
+      const htmlPath = toHtmlPathFromIndexRef(prefixDir ? `${prefixDir}/${entry}` : entry)
+      const normalized = normalizeRelPath(htmlPath)
+      if (!expected.has(normalized)) throw new Error(`unknown file: ${normalized}`)
+      if (used.has(normalized)) throw new Error(`duplicate file: ${normalized}`)
+      used.add(normalized)
+      const f = byPath.get(normalized)
+      if (!f) throw new Error(`missing file: ${normalized}`)
+      ordered.push(f)
+      return
+    }
+    if (!entry || typeof entry !== 'object') throw new Error('invalid entry')
+    const obj = entry as Record<string, unknown>
+    const title = typeof obj.title === 'string' ? obj.title.trim() : ''
+    const dir = typeof obj.path === 'string' ? obj.path.trim() : ''
+    const docs = obj.docs
+    if (!title || !dir || !Array.isArray(docs)) throw new Error('invalid group entry')
+    const normalizedDir = normalizeRelPath(prefixDir ? `${prefixDir}/${dir}` : dir)
+    dirTitles[normalizedDir] = title
+    for (const child of docs) visit(child, normalizedDir)
+  }
+
+  for (const entry of rawIndexJson) visit(entry, '')
+  for (const f of files) {
+    const p = normalizeRelPath(f.path)
+    if (!expected.has(p)) continue
+    if (used.has(p)) continue
+    ordered.push(f)
+  }
+  return { ordered, dirTitles }
+}
+
 export async function buildDocsIndex(docsRoot: string, opts?: { includeGit?: boolean }) {
   const out: DocsIndexFile[] = []
   const includeGit = opts?.includeGit !== false
@@ -193,8 +311,21 @@ export async function buildDocsIndex(docsRoot: string, opts?: { includeGit?: boo
   }
 
   await walk(docsRoot)
-  out.sort((a, b) => a.path.localeCompare(b.path))
-  const payload: DocsIndexPayload = { generatedAt: new Date().toISOString(), files: out }
+  let orderedFiles = buildDefaultOrderedFiles(out)
+  const payload: DocsIndexPayload = { generatedAt: new Date().toISOString(), files: orderedFiles }
+
+  try {
+    const rawIndex = await readIndexJson(docsRoot)
+    if (rawIndex) {
+      const applied = applyIndexJsonOrder(orderedFiles, rawIndex)
+      orderedFiles = applied.ordered
+      payload.files = orderedFiles
+      payload.orderSource = 'index.json'
+      payload.dirTitles = applied.dirTitles
+    }
+  } catch {
+    payload.files = buildDefaultOrderedFiles(out)
+  }
   return payload
 }
 

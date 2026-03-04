@@ -22,6 +22,8 @@ export type DocsIndexPayload = {
   missingRoot?: boolean
   root?: string
   docsDirectory?: string
+  orderSource?: 'index.json'
+  dirTitles?: Record<string, string>
 }
 
 export type DocsGitCommit = {

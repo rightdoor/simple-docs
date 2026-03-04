@@ -17,10 +17,16 @@ export type DocsFile = {
 }
 
 export type DocsTreeNode = {
+  title?: string
+  children?: DocsTreeChild[]
   dirs?: Record<string, DocsTreeNode>
   files?: DocsFile[]
   readme?: DocsFile
 }
+
+export type DocsTreeChild =
+  | { type: 'dir'; name: string }
+  | { type: 'file'; file: DocsFile }
 
 export type DocsIndex = {
   generatedAt: string
@@ -41,6 +47,8 @@ export type DocsIndex = {
   missingRoot?: boolean
   root?: string
   docsDirectory?: string
+  orderSource?: 'index.json'
+  dirTitles?: Record<string, string>
 }
 
 export type DocsGitCommit = {
@@ -275,12 +283,18 @@ export async function resolveDocsPathFromRoute(raw: string) {
 }
 
 export function buildDocsTreeFromIndex(index: DocsIndex): DocsTreeNode {
+  const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
   const root: DocsTreeNode = {}
+
+  const dirTitles = index.dirTitles || {}
+  const positionByPath = new Map<string, number>()
+  index.files.forEach((f, i) => positionByPath.set(f.path, i))
 
   for (const f of index.files) {
     const p = f.path
     const parts = p.split('/').filter(Boolean)
     let cur = root
+    let dirPrefix = ''
     for (const [i, part] of parts.entries()) {
       const isFile = i === parts.length - 1
 
@@ -288,6 +302,9 @@ export function buildDocsTreeFromIndex(index: DocsIndex): DocsTreeNode {
         cur.dirs ??= {}
         cur.dirs[part] ??= {}
         cur = cur.dirs[part]!
+        dirPrefix = dirPrefix ? `${dirPrefix}/${part}` : part
+        const titled = dirTitles[dirPrefix]
+        if (titled) cur.title = titled
         continue
       }
 
@@ -312,5 +329,58 @@ export function buildDocsTreeFromIndex(index: DocsIndex): DocsTreeNode {
     }
   }
 
+  function getFileOrder(file: DocsFile) {
+    const pos = positionByPath.get(file.path)
+    return typeof pos === 'number' ? pos : Number.MAX_SAFE_INTEGER
+  }
+
+  function finalizeNode(node: DocsTreeNode) {
+    const entries: Array<{ key: string; type: 'dir' | 'file'; order: number }> = []
+    let min = Number.MAX_SAFE_INTEGER
+
+    if (node.dirs) {
+      for (const [dirName, dirNode] of Object.entries(node.dirs)) {
+        const childMin = finalizeNode(dirNode)
+        entries.push({ key: dirName, type: 'dir', order: childMin })
+        if (childMin < min) min = childMin
+      }
+    }
+
+    if (node.files) {
+      for (const file of node.files) {
+        const order = getFileOrder(file)
+        entries.push({ key: file.path, type: 'file', order })
+        if (order < min) min = order
+      }
+    }
+
+    if (node.readme) {
+      const order = getFileOrder(node.readme)
+      if (order < min) min = order
+    }
+
+    const hasIndexOrder = index.orderSource === 'index.json'
+    entries.sort((a, b) => {
+      if (a.order !== b.order) return a.order - b.order
+      if (!hasIndexOrder) {
+        if (a.type !== b.type) return a.type === 'dir' ? -1 : 1
+      }
+      return collator.compare(a.key, b.key)
+    })
+
+    const nextChildren: DocsTreeChild[] = []
+    for (const e of entries) {
+      if (e.type === 'dir') nextChildren.push({ type: 'dir', name: e.key })
+      else {
+        const file = node.files?.find((f) => f.path === e.key)
+        if (file) nextChildren.push({ type: 'file', file })
+      }
+    }
+    node.children = nextChildren
+
+    return min
+  }
+
+  finalizeNode(root)
   return root
 }
