@@ -24,6 +24,9 @@
   color: var(--text-title);
   margin-bottom: 8px;
   line-height: 1.35;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .post-description {
