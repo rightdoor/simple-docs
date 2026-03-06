@@ -14,7 +14,8 @@
   "build.cloneFailedOrTimeout": "[zh-CN] 克隆失败/超时，请检查仓库是否为公开仓库/网络是否超时。",
   "build.autoCreateDocsDir": "[zh-CN] 目标 {dir} 不存在，自动创建。",
   "build.indexJsonMissingDefaultOrder": "[zh-CN] index.json 不存在，使用默认排序。",
-  "build.indexJsonCustomOrder": "[zh-CN] index.json 存在，使用自定义排序。",
+  "build.indexJsonCustomOrderOk": "[zh-CN] index.json 存在且正常读取，使用自定义排序。",
+  "build.indexJsonCustomOrderBad": "[zh-CN] index.json 存在但不能正常读取，使用默认排序。",
 
   "app.search": "搜索",
   "app.immersive": "沉浸浏览",

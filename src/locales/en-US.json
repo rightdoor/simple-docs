@@ -14,7 +14,8 @@
   "build.cloneFailedOrTimeout": "[en-US] Clone failed or timed out. Please check repository access or network.",
   "build.autoCreateDocsDir": "[en-US] Target {dir} does not exist, creating it automatically.",
   "build.indexJsonMissingDefaultOrder": "[en-US] index.json not found, using default order.",
-  "build.indexJsonCustomOrder": "[en-US] index.json found, using custom order.",
+  "build.indexJsonCustomOrderOk": "[en-US] index.json found and readable, using custom order.",
+  "build.indexJsonCustomOrderBad": "[en-US] index.json found but unreadable, using default order.",
 
   "app.search": "Search",
   "app.immersive": "Immersive",
