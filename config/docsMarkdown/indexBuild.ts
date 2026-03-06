@@ -6,7 +6,17 @@ import { promises as fs } from 'node:fs'
 import simpleGit, { type SimpleGit } from 'simple-git'
 import { createShortHash, ensureFrontmatterId, parseFrontmatter } from './frontmatter'
 import { markdownPathToHtmlPath, toPosix } from './paths'
-import type { DocsGitCommit, DocsGitContributor, DocsGitInfo, DocsGitStatus, DocsIndexFile, DocsIndexPayload } from './types'
+import type {
+  DocsGitCommit,
+  DocsGitContributor,
+  DocsGitInfo,
+  DocsGitStatus,
+  DocsIndexFile,
+  DocsIndexPayload,
+  DocsSidebarTreeChild,
+  DocsSidebarTreeFile,
+  DocsSidebarTreeNode,
+} from './types'
 
 async function initGit(docsRoot: string) {
   try {
@@ -177,50 +187,91 @@ async function readIndexJson(docsRoot: string) {
   return JSON.parse(raw) as unknown
 }
 
+function toSidebarFile(f: DocsIndexFile): DocsSidebarTreeFile {
+  return {
+    id: f.id,
+    name: f.name,
+    title: f.title,
+    description: f.description,
+    path: f.path,
+    type: 'html',
+    created: f.created,
+    modified: f.modified,
+    size: f.size,
+  }
+}
+
 function applyIndexJsonOrder(files: DocsIndexFile[], rawIndexJson: unknown) {
   if (!Array.isArray(rawIndexJson)) throw new Error('index.json root is not array')
   const expected = new Set(files.map((f) => normalizeRelPath(f.path)))
-  const byPath = new Map(files.map((f) => [normalizeRelPath(f.path), f] as const))
+  const byHtmlPath = new Map(files.map((f) => [normalizeRelPath(f.path), f] as const))
+
   const used = new Set<string>()
   const ordered: DocsIndexFile[] = []
-  const dirTitles: Record<string, string> = {}
+  const sidebarTree: DocsSidebarTreeNode = {}
+
+  let groupSeq = 0
 
   function toHtmlPathFromIndexRef(rel: string) {
     const normalized = normalizeRelPath(rel)
     return markdownPathToHtmlPath(normalized)
   }
 
-  function visit(entry: unknown, prefixDir: string) {
+  function ensureNodeDirs(node: DocsSidebarTreeNode) {
+    node.dirs ??= {}
+    return node.dirs
+  }
+
+  function ensureNodeFiles(node: DocsSidebarTreeNode) {
+    node.files ??= []
+    return node.files
+  }
+
+  function ensureNodeChildren(node: DocsSidebarTreeNode) {
+    node.children ??= []
+    return node.children
+  }
+
+  function visit(entry: unknown, node: DocsSidebarTreeNode) {
     if (typeof entry === 'string') {
-      const htmlPath = toHtmlPathFromIndexRef(prefixDir ? `${prefixDir}/${entry}` : entry)
+      const htmlPath = toHtmlPathFromIndexRef(entry)
       const normalized = normalizeRelPath(htmlPath)
       if (!expected.has(normalized)) throw new Error(`unknown file: ${normalized}`)
       if (used.has(normalized)) throw new Error(`duplicate file: ${normalized}`)
       used.add(normalized)
-      const f = byPath.get(normalized)
+      const f = byHtmlPath.get(normalized)
       if (!f) throw new Error(`missing file: ${normalized}`)
       ordered.push(f)
+
+      const file = toSidebarFile(f)
+      const filesArr = ensureNodeFiles(node)
+      filesArr.push(file)
+      const childrenArr = ensureNodeChildren(node)
+      childrenArr.push({ type: 'file', file } satisfies DocsSidebarTreeChild)
       return
     }
+
     if (!entry || typeof entry !== 'object') throw new Error('invalid entry')
     const obj = entry as Record<string, unknown>
     const title = typeof obj.title === 'string' ? obj.title.trim() : ''
-    const dir = typeof obj.path === 'string' ? obj.path.trim() : ''
     const docs = obj.docs
-    if (!title || !dir || !Array.isArray(docs)) throw new Error('invalid group entry')
-    const normalizedDir = normalizeRelPath(prefixDir ? `${prefixDir}/${dir}` : dir)
-    dirTitles[normalizedDir] = title
-    for (const child of docs) visit(child, normalizedDir)
+    if (!title || !Array.isArray(docs)) throw new Error('invalid group entry')
+
+    const dirKey = `__g${groupSeq++}`
+    const dirs = ensureNodeDirs(node)
+    if (dirs[dirKey]) throw new Error(`duplicate group key: ${dirKey}`)
+    const dirNode: DocsSidebarTreeNode = { title }
+    dirs[dirKey] = dirNode
+    const childrenArr = ensureNodeChildren(node)
+    childrenArr.push({ type: 'dir', name: dirKey } satisfies DocsSidebarTreeChild)
+
+    for (const child of docs) visit(child, dirNode)
   }
 
-  for (const entry of rawIndexJson) visit(entry, '')
-  for (const f of files) {
-    const p = normalizeRelPath(f.path)
-    if (!expected.has(p)) continue
-    if (used.has(p)) continue
-    ordered.push(f)
-  }
-  return { ordered, dirTitles }
+  for (const entry of rawIndexJson) visit(entry, sidebarTree)
+  if (used.size !== expected.size) throw new Error('index.json does not cover all docs')
+
+  return { ordered, sidebarTree }
 }
 
 export async function buildDocsIndex(docsRoot: string, opts?: { includeGit?: boolean }) {
@@ -321,7 +372,7 @@ export async function buildDocsIndex(docsRoot: string, opts?: { includeGit?: boo
       orderedFiles = applied.ordered
       payload.files = orderedFiles
       payload.orderSource = 'index.json'
-      payload.dirTitles = applied.dirTitles
+      payload.sidebarTree = applied.sidebarTree
     }
   } catch {
     payload.files = buildDefaultOrderedFiles(out)

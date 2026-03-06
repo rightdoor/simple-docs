@@ -49,6 +49,7 @@ export type DocsIndex = {
   docsDirectory?: string
   orderSource?: 'index.json'
   dirTitles?: Record<string, string>
+  sidebarTree?: DocsTreeNode
 }
 
 export type DocsGitCommit = {
@@ -283,6 +284,7 @@ export async function resolveDocsPathFromRoute(raw: string) {
 }
 
 export function buildDocsTreeFromIndex(index: DocsIndex): DocsTreeNode {
+  if (index.sidebarTree) return index.sidebarTree
   const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
   const root: DocsTreeNode = {}
 

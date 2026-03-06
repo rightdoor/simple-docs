@@ -24,6 +24,31 @@ export type DocsIndexPayload = {
   docsDirectory?: string
   orderSource?: 'index.json'
   dirTitles?: Record<string, string>
+  sidebarTree?: DocsSidebarTreeNode
+}
+
+export type DocsSidebarTreeFile = {
+  id: string
+  name: string
+  title?: string
+  description?: string
+  path: string
+  type: 'html'
+  created?: string
+  modified?: string
+  size?: number
+}
+
+export type DocsSidebarTreeChild =
+  | { type: 'dir'; name: string }
+  | { type: 'file'; file: DocsSidebarTreeFile }
+
+export type DocsSidebarTreeNode = {
+  title?: string
+  dirs?: Record<string, DocsSidebarTreeNode>
+  files?: DocsSidebarTreeFile[]
+  readme?: DocsSidebarTreeFile
+  children?: DocsSidebarTreeChild[]
 }
 
 export type DocsGitCommit = {

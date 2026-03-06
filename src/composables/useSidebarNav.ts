@@ -46,22 +46,32 @@ export function useSidebarNav() {
   }
 
   const activeDirSet = computed(() => {
-    const set = new Set<string>()
-    const parts = activePath.value.split('/').filter(Boolean)
-    let cur = ''
-    for (const seg of parts.slice(0, -1)) {
-      cur = cur ? `${cur}/${seg}` : seg
-      set.add(cur)
+    const root = tree.value
+    if (!root) return new Set<string>()
+
+    const target = activePath.value
+    const chain: string[] = []
+
+    function contains(node: DocsTreeNode, prefix: string): boolean {
+      if (node.readme?.path === target) return true
+      if (node.files?.some((f) => f.path === target)) return true
+      for (const [dirName, dirNode] of Object.entries(node.dirs ?? {})) {
+        const full = prefix ? `${prefix}/${dirName}` : dirName
+        if (contains(dirNode, full)) {
+          chain.unshift(full)
+          return true
+        }
+      }
+      return false
     }
-    return set
+
+    contains(root, '')
+    return new Set(chain)
   })
 
   function ensureExpandedToActive() {
-    const parts = activePath.value.split('/').filter(Boolean)
-    let cur = ''
-    for (const seg of parts.slice(0, -1)) {
-      cur = cur ? `${cur}/${seg}` : seg
-      if (expanded[cur] === undefined) expanded[cur] = true
+    for (const full of activeDirSet.value) {
+      if (expanded[full] === undefined) expanded[full] = true
     }
   }
 
