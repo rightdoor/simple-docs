@@ -203,7 +203,6 @@ function toSidebarFile(f: DocsIndexFile): DocsSidebarTreeFile {
 
 function applyIndexJsonOrder(files: DocsIndexFile[], rawIndexJson: unknown) {
   if (!Array.isArray(rawIndexJson)) throw new Error('index.json root is not array')
-  const expected = new Set(files.map((f) => normalizeRelPath(f.path)))
   const byHtmlPath = new Map(files.map((f) => [normalizeRelPath(f.path), f] as const))
 
   const used = new Set<string>()
@@ -236,11 +235,10 @@ function applyIndexJsonOrder(files: DocsIndexFile[], rawIndexJson: unknown) {
     if (typeof entry === 'string') {
       const htmlPath = toHtmlPathFromIndexRef(entry)
       const normalized = normalizeRelPath(htmlPath)
-      if (!expected.has(normalized)) throw new Error(`unknown file: ${normalized}`)
       if (used.has(normalized)) throw new Error(`duplicate file: ${normalized}`)
-      used.add(normalized)
       const f = byHtmlPath.get(normalized)
-      if (!f) throw new Error(`missing file: ${normalized}`)
+      if (!f) throw new Error(`unknown file: ${normalized}`)
+      used.add(normalized)
       ordered.push(f)
 
       const file = toSidebarFile(f)
@@ -269,8 +267,6 @@ function applyIndexJsonOrder(files: DocsIndexFile[], rawIndexJson: unknown) {
   }
 
   for (const entry of rawIndexJson) visit(entry, sidebarTree)
-  if (used.size !== expected.size) throw new Error('index.json does not cover all docs')
-
   return { ordered, sidebarTree }
 }
 
