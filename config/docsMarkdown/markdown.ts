@@ -320,7 +320,7 @@ export async function compileMarkdownToHtmlFragment(
       const lineNumbers = buildLineNumbers(code)
       const copyText = tConfig(language, 'code.copy')
       const copyAria = tConfig(language, 'code.copyAria')
-      return `<div class="code-block" data-lang="${escapeAttr(langLabel)}"><span class="code-lang">${escapeAttr(langLabel)}</span><button class="code-copy" type="button" aria-label="${escapeAttr(copyAria)}">${escapeAttr(copyText)}</button><div class="code-body"><div class="code-gutter">${lineNumbers}</div><pre class="code-pre"><code class="${langClass}">${highlighted}</code></pre></div></div>`
+      return `<div class="code-block" data-lang="${escapeAttr(langLabel)}"><button class="code-lang">${escapeAttr(langLabel)}</button><button class="code-copy" type="button" aria-label="${escapeAttr(copyAria)}">${escapeAttr(copyText)}</button><div class="code-body"><div class="code-gutter">${lineNumbers}</div><pre class="code-pre"><code class="${langClass}">${highlighted}</code></pre></div></div>`
     },
   })
     .use(mathBlockPlugin)
