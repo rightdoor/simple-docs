@@ -274,10 +274,28 @@ export async function buildDocsIndex(docsRoot: string, opts?: { includeGit?: boo
   const out: DocsIndexFile[] = []
   const includeGit = opts?.includeGit !== false
   const git = includeGit ? await initGit(docsRoot) : null
+  let repoUrl = ''
+  let repoBranch = ''
   let statusMap = new Map<string, DocsGitStatus>()
   let gitInfoMap = new Map<string, GitAggregateEntry>()
   if (git) {
     try {
+      try {
+        const remotes = await git.getRemotes(true)
+        const origin = remotes.find((r) => r.name === 'origin') ?? remotes[0]
+        const refs = origin?.refs
+        repoUrl = String(refs?.fetch || refs?.push || '').trim()
+      } catch {
+        repoUrl = ''
+      }
+
+      try {
+        const br = await git.branchLocal()
+        repoBranch = String(br.current || '').trim()
+      } catch {
+        repoBranch = ''
+      }
+
       const status = await git.status()
       statusMap = buildGitStatusMap(status)
       const log = await git.raw([
@@ -360,6 +378,8 @@ export async function buildDocsIndex(docsRoot: string, opts?: { includeGit?: boo
   await walk(docsRoot)
   let orderedFiles = buildDefaultOrderedFiles(out)
   const payload: DocsIndexPayload = { generatedAt: new Date().toISOString(), files: orderedFiles }
+  if (repoUrl) payload.gitRepoUrl = repoUrl
+  if (repoBranch) payload.gitBranch = repoBranch
 
   try {
     const rawIndex = await readIndexJson(docsRoot)

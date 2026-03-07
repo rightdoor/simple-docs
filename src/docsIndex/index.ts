@@ -47,6 +47,8 @@ export type DocsIndex = {
   missingRoot?: boolean
   root?: string
   docsDirectory?: string
+  gitRepoUrl?: string
+  gitBranch?: string
   orderSource?: 'index.json'
   dirTitles?: Record<string, string>
   sidebarTree?: DocsTreeNode

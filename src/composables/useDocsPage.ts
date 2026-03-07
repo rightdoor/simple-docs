@@ -229,8 +229,12 @@ export function useDocsPage() {
       const isRepo = currentIndex.isGitRepo === true
       showGitInfo.value = cfg.git?.showInfo !== false && isRepo
       showEdit.value = cfg.git?.edit !== false && isRepo
-      const repo = cfg.git?.repository?.trim() || ''
-      const branch = cfg.git?.branch?.trim() || ''
+      const repoFromGit = (currentIndex.gitRepoUrl || '').trim()
+      const branchFromGit = (currentIndex.gitBranch || '').trim()
+      const repoFromConfig = cfg.git?.repository?.trim() || ''
+      const branchFromConfig = cfg.git?.branch?.trim() || ''
+      const repo = repoFromGit || repoFromConfig
+      const branch = branchFromGit || branchFromConfig
       remoteRepoUrl.value = repo
       remoteRepoBranch.value = branch
       remoteRepoName.value = repo ? parseRepoName(repo) : ''
