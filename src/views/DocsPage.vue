@@ -145,19 +145,21 @@ function syncDetailsOpen(ev: Event) {
       </div>
     </header>
     <div ref="mdContainer" class="markdown-body" v-viewer.rebuild v-html="html"></div>
-    <div class="post-updated-time" :class="{ 'with-bottom': !showEditLink }" v-if="modifiedAt">
-      <span class="post-desc-meta-item">
-        <Icon class="icon icon-14" icon="material-symbols:update" />
-        {{ t('docs.modifiedAt') }}{{ modifiedAt }}
-      </span>
-    </div>
-    <div class="post-edit-link" v-if="showEditLink">
-      <a :href="editUrl" target="_blank" rel="noopener noreferrer">
+    <div class="view-bottom" v-if="modifiedAt || showEditLink">
+      <div class="post-updated-time" v-if="modifiedAt">
         <span class="post-desc-meta-item">
-          <Icon class="icon icon-14" icon="material-symbols:edit-square-outline" />
-          {{ t('docs.editThis') }}
+          <Icon class="icon icon-14" icon="material-symbols:update" />
+          {{ t('docs.modifiedAt') }}{{ modifiedAt }}
         </span>
-      </a>
+      </div>
+      <div class="post-edit-link" v-if="showEditLink">
+        <a :href="editUrl" target="_blank" rel="noopener noreferrer">
+          <span class="post-desc-meta-item">
+            <Icon class="icon icon-14" icon="material-symbols:edit-square-outline" />
+            {{ t('docs.editThis') }}
+          </span>
+        </a>
+      </div>
     </div>
     <!-- 上/下一篇 -->
     <div class="post-pager" v-if="prevDoc || nextDoc">

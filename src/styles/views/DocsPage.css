@@ -7,6 +7,8 @@
   display: none;
   margin: 20px 0 8px;
   gap: 10px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-light);
   justify-content: space-between;
 }
 

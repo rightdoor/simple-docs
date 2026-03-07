@@ -178,26 +178,27 @@
   word-break: break-word;
 }
 
+.view-bottom {
+  margin-top: 40px;
+  padding: 24px 0 0 0;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .post-updated-time {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 6px;
-  margin-top: 40px;
-  padding: 24px 0 0 0;
-  border-top: 1px solid var(--border-light);
   font-size: 13px;
   color: var(--text-placeholder);
-}
-
-.post-updated-time.with-bottom {
-  padding-bottom: 24px;
 }
 
 .post-edit-link {
   display: flex;
   justify-content: flex-start;
-  margin-top: 8px;
   padding-bottom: 4px;
   font-size: 13px;
 }
