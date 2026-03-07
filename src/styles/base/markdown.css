@@ -596,8 +596,16 @@
   transition: border-color 0.15s;
 }
 
-.markdown-body a:hover {
+.markdown-body a[href] {
+  color: var(--primary);
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s ease;
   border-bottom-color: var(--primary);
+}
+
+.markdown-body a[href]:hover {
+  transform: scale(1.05);
 }
 
 .markdown-body img {
