@@ -6,6 +6,7 @@
   font-weight: 500;
   font-display: swap;
 } */
+@import url("https://fontsapi.zeoseven.com/292/main/result.css");
 
 * {
   margin: 0;
@@ -17,6 +18,10 @@ body {
   /* font-family: 'xxx';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; */
+  font-family: "LXGW WenKai", monospace;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background-color: var(--bg-container);
   color: var(--text-body);
   line-height: 1.5;

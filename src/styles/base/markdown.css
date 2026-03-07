@@ -316,8 +316,8 @@
   font-size: 13px;
   background-color: var(--code-inline-bg);
   border-radius: 4px;
-  font-family: 'SF Mono', Monaco, Menlo, Consolas, monospace;
   color: var(--code-inline-color);
+  font-family: var(--code-font-family);
 }
 
 .markdown-body pre:not(.code-pre) {
@@ -378,7 +378,7 @@
   overflow: visible;
   --code-line-height: 1.7;
   --code-font-size: 13px;
-  --code-font-family: 'SF Mono', Monaco, Menlo, Consolas, monospace;
+  --code-font-family: 'LXGW WenKai', monospace;
 }
 
 .markdown-body .code-body {
