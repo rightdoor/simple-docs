@@ -5,6 +5,8 @@ import { loadDocsConfigSync } from './config/docsConfig'
 import { docsFsPlugin } from './config/docsMarkdown'
 import { isMathjaxModuleId, mathjaxAssetsPlugin } from './config/viteMathjax'
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 export default defineConfig(() => {
   const configPayload = loadDocsConfigSync(process.cwd())
   return {
@@ -25,7 +27,7 @@ export default defineConfig(() => {
         },
       },
     },
-    plugins: [mathjaxAssetsPlugin(), docsFsPlugin(), vue()],
+    plugins: [mathjaxAssetsPlugin(), docsFsPlugin(), vue(), cloudflare()],
     resolve: {
       alias: {
         '@': path.resolve(process.cwd(), 'src'),
@@ -37,5 +39,5 @@ export default defineConfig(() => {
     server: {
       port: 8080,
     },
-  }
+  };
 })
