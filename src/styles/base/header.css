@@ -40,7 +40,7 @@
 }
 
 .site-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-title);
   margin: 0;
@@ -59,7 +59,7 @@
 }
 
 .site-description {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-placeholder);
   margin: 0;
 }
@@ -93,7 +93,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-secondary);
   text-decoration: none;
   padding: 6px 12px;

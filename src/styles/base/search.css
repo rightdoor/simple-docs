@@ -112,7 +112,7 @@
 }
 
 .search-snippet {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
   color: var(--text-secondary);
   word-break: break-word;
@@ -121,7 +121,7 @@
 .search-empty {
   padding: 6px 4px;
   color: var(--text-placeholder);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .search-item-empty {
