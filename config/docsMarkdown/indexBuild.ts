@@ -205,7 +205,7 @@ function applyIndexJsonOrder(files: DocsIndexFile[], rawIndexJson: unknown) {
   if (!Array.isArray(rawIndexJson)) throw new Error('index.json root is not array')
   const byHtmlPath = new Map(files.map((f) => [normalizeRelPath(f.path), f] as const))
 
-  const used = new Set<string>()
+  const usedSet = new Set<string>()
   const ordered: DocsIndexFile[] = []
   const sidebarTree: DocsSidebarTreeNode = {}
 
@@ -214,6 +214,18 @@ function applyIndexJsonOrder(files: DocsIndexFile[], rawIndexJson: unknown) {
   function toHtmlPathFromIndexRef(rel: string) {
     const normalized = normalizeRelPath(rel)
     return markdownPathToHtmlPath(normalized)
+  }
+
+  function parseIndexEntry(entry: unknown): string | { title: string; docs: unknown[] } {
+    if (typeof entry === 'string') return entry
+    if (!entry || typeof entry !== 'object') throw new Error('invalid entry')
+    const obj = entry as Record<string, unknown>
+    const keys = Object.keys(obj)
+    if (keys.length !== 2 || !keys.includes('title') || !keys.includes('docs')) throw new Error('invalid group entry')
+    const title = typeof obj.title === 'string' ? obj.title.trim() : ''
+    const docs = obj.docs
+    if (!title || !Array.isArray(docs)) throw new Error('invalid group entry')
+    return { title, docs }
   }
 
   function ensureNodeDirs(node: DocsSidebarTreeNode) {
@@ -232,13 +244,14 @@ function applyIndexJsonOrder(files: DocsIndexFile[], rawIndexJson: unknown) {
   }
 
   function visit(entry: unknown, node: DocsSidebarTreeNode) {
-    if (typeof entry === 'string') {
-      const htmlPath = toHtmlPathFromIndexRef(entry)
+    const parsed = parseIndexEntry(entry)
+    if (typeof parsed === 'string') {
+      const htmlPath = toHtmlPathFromIndexRef(parsed)
       const normalized = normalizeRelPath(htmlPath)
-      if (used.has(normalized)) throw new Error(`duplicate file: ${normalized}`)
       const f = byHtmlPath.get(normalized)
       if (!f) throw new Error(`unknown file: ${normalized}`)
-      used.add(normalized)
+      if (usedSet.has(normalized)) throw new Error(`duplicate file: ${normalized}`)
+      usedSet.add(normalized)
       ordered.push(f)
 
       const file = toSidebarFile(f)
@@ -249,11 +262,7 @@ function applyIndexJsonOrder(files: DocsIndexFile[], rawIndexJson: unknown) {
       return
     }
 
-    if (!entry || typeof entry !== 'object') throw new Error('invalid entry')
-    const obj = entry as Record<string, unknown>
-    const title = typeof obj.title === 'string' ? obj.title.trim() : ''
-    const docs = obj.docs
-    if (!title || !Array.isArray(docs)) throw new Error('invalid group entry')
+    const { title, docs } = parsed
 
     const dirKey = `__g${groupSeq++}`
     const dirs = ensureNodeDirs(node)
@@ -261,9 +270,20 @@ function applyIndexJsonOrder(files: DocsIndexFile[], rawIndexJson: unknown) {
     const dirNode: DocsSidebarTreeNode = { title }
     dirs[dirKey] = dirNode
     const childrenArr = ensureNodeChildren(node)
+    const childIndex = childrenArr.length
     childrenArr.push({ type: 'dir', name: dirKey } satisfies DocsSidebarTreeChild)
 
     for (const child of docs) visit(child, dirNode)
+
+    const hasChildren =
+      (dirNode.children && dirNode.children.length > 0) ||
+      (dirNode.files && dirNode.files.length > 0) ||
+      !!dirNode.readme ||
+      (dirNode.dirs && Object.keys(dirNode.dirs).length > 0)
+    if (!hasChildren) {
+      delete dirs[dirKey]
+      childrenArr.splice(childIndex, 1)
+    }
   }
 
   for (const entry of rawIndexJson) visit(entry, sidebarTree)
