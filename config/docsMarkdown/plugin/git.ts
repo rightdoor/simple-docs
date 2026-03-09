@@ -22,6 +22,23 @@ function normalizeRepoUrl(input: string) {
   return raw.replace(/\/+$/, '').replace(/\.git$/i, '').toLowerCase()
 }
 
+function sanitizeRemoteUrl(input: string) {
+  const raw = String(input || '').trim()
+  if (!raw) return ''
+  try {
+    const url = new URL(raw)
+    if (url.username || url.password) {
+      url.username = ''
+      url.password = ''
+    }
+    return url.toString()
+  } catch {
+    const match = raw.match(/^([a-z][a-z0-9+.-]*:\/\/)([^@\/\s]+@)(.*)$/i)
+    if (match) return `${match[1]}${match[3]}`
+    return raw
+  }
+}
+
 async function getRepoInfo(docsRoot: string) {
   const gitClient = simpleGit({ baseDir: docsRoot })
   let remote = ''
@@ -29,7 +46,7 @@ async function getRepoInfo(docsRoot: string) {
     const remotes = await gitClient.getRemotes(true)
     const origin = remotes.find((r) => r.name === 'origin') ?? remotes[0]
     const refs = origin?.refs
-    remote = String(refs?.fetch || refs?.push || '').trim()
+    remote = sanitizeRemoteUrl(String(refs?.fetch || refs?.push || '').trim())
   } catch {
     remote = ''
   }

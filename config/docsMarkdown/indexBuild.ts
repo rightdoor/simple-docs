@@ -128,6 +128,23 @@ function normalizeRelPath(p: string) {
   return toPosix(p).replace(/^\.\//, '').replace(/^\/+/, '')
 }
 
+function sanitizeRemoteUrl(input: string) {
+  const raw = String(input || '').trim()
+  if (!raw) return ''
+  try {
+    const url = new URL(raw)
+    if (url.username || url.password) {
+      url.username = ''
+      url.password = ''
+    }
+    return url.toString()
+  } catch {
+    const match = raw.match(/^([a-z][a-z0-9+.-]*:\/\/)([^@\/\s]+@)(.*)$/i)
+    if (match) return `${match[1]}${match[3]}`
+    return raw
+  }
+}
+
 function buildDefaultOrderedFiles(files: DocsIndexFile[]) {
   const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
   const root = createTreeNode()
@@ -304,7 +321,7 @@ export async function buildDocsIndex(docsRoot: string, opts?: { includeGit?: boo
         const remotes = await git.getRemotes(true)
         const origin = remotes.find((r) => r.name === 'origin') ?? remotes[0]
         const refs = origin?.refs
-        repoUrl = String(refs?.fetch || refs?.push || '').trim()
+        repoUrl = sanitizeRemoteUrl(String(refs?.fetch || refs?.push || '').trim())
       } catch {
         repoUrl = ''
       }
