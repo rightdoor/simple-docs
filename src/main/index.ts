@@ -16,6 +16,8 @@ w.MathJax = {
   loader: {
     paths: {
       mathjax: '/mathjax',
+      // 字体文件路径
+      fonts: '/mathjax-fonts',
     },
     load: ['input/tex', 'output/svg', '[tex]/noerrors'],
     require: (src: string) => import(/* @vite-ignore */ src),
@@ -43,6 +45,10 @@ w.MathJax = {
   },
   options: {
     renderActions: {},
+  },
+  // 设置输出字体
+  output: {
+    font: 'mathjax-tex',
   },
 }
 const mathjaxReady = (async () => {

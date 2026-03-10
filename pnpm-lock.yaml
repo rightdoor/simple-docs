@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@mathjax/mathjax-tex-font':
+        specifier: ^4.1.1
+        version: 4.1.1
       chart.js:
         specifier: 4.5.1
         version: 4.5.1
@@ -338,6 +341,9 @@ packages:
 
   '@mathjax/mathjax-newcm-font@4.1.1':
     resolution: {integrity: sha512-LeV5AWzoR7k/k2tg5mW0Ad3Jr9oK9guW/zBUIP8aoiIZcZIhvAV9dlbtUSqSe1wgEBUP1KOcJXcrE/NxOqkxlQ==}
+
+  '@mathjax/mathjax-tex-font@4.1.1':
+    resolution: {integrity: sha512-mCBD2JOLCwnL0WBgBOE8IXCShPDRY7BlDq1l8QVl/1kgEj2+zJotUa2I8uhohOTFrOsGeAzFbaletzuAubp6YA==}
 
   '@mermaid-js/parser@1.0.0':
     resolution: {integrity: sha512-vvK0Hi/VWndxoh03Mmz6wa1KDriSPjS2XMZL/1l19HFwygiObEEoEwSDxOqyLzzAI6J2PU3261JjTMTO7x+BPw==}
@@ -1506,6 +1512,8 @@ snapshots:
   '@kwsites/promise-deferred@1.1.1': {}
 
   '@mathjax/mathjax-newcm-font@4.1.1': {}
+
+  '@mathjax/mathjax-tex-font@4.1.1': {}
 
   '@mermaid-js/parser@1.0.0':
     dependencies:

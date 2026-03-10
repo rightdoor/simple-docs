@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "build-origin": "vue-tsc -b && vite build",
+    "build": "vue-tsc -b && vite build && node -e \"const fs=require('node:fs');const path=require('node:path');const src=path.dirname(require.resolve('@mathjax/mathjax-tex-font/package.json'));const dst=path.join('dist','mathjax-fonts','mathjax-tex-font');fs.rmSync(dst,{recursive:true,force:true});fs.mkdirSync(path.dirname(dst),{recursive:true});fs.cpSync(src,dst,{recursive:true});\"",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mathjax/mathjax-tex-font": "^4.1.1",
     "chart.js": "4.5.1",
     "markdown-it": "14.1.1",
     "markdown-it-abbr": "^2.0.0",
