@@ -18,16 +18,13 @@ export function useSidebarNav() {
   const pathToId = new Map<string, string>()
   const idToPath = new Map<string, string>()
 
-  function encodePath(p: string) {
-    return p
-      .split('/')
-      .map((seg) => encodeURIComponent(seg))
-      .join('/')
-  }
-
   function navigateTo(path: string) {
     const id = pathToId.get(path)
-    router.push(`/post/${id ?? encodePath(path)}`)
+    if (!id) {
+      router.push('/404')
+      return
+    }
+    router.push(`/post/${encodeURIComponent(id)}`)
   }
 
   const activePath = ref('README.html')

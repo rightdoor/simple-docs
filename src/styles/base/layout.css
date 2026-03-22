@@ -30,6 +30,6 @@
 }
 
 .app-container.simple-page .view {
-  max-width: 720px;
+  max-width: var(--view-max-width, 850px);
   padding: var(--header-height) 24px var(--footer-height);
 }

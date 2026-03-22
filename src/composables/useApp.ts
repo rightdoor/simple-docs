@@ -82,7 +82,7 @@ export function useApp() {
   const closeSearch = searchManager.closeSearch
   const selectSearchResult = searchManager.selectSearchResult
   const sidebarOpen = ref(false)
-  const isSimplePage = computed(() => route.name === 'warning' || route.name === 'not-found')
+  const isSimplePage = computed(() => route.name === 'index' || route.name === 'warning' || route.name === 'not-found')
   const immersiveMode = ref(false)
   const savedSidebarCollapsed = ref(false)
   const savedTocCollapsed = ref(false)

@@ -208,6 +208,9 @@ export function encodeDocsPathForRoute(path: string) {
 export async function resolveHomeRoute(config: DocsConfig) {
   const docsDir = normalizePathForCompare(config.docsDirectory)
   const homepage = normalizeFilePath(config.homepage)
+  if (homepage && !homepage.includes('/') && !homepage.includes('.')) {
+    return `/post/${encodeURIComponent(homepage)}`
+  }
   let rel = homepage
   if (docsDir && homepage.startsWith(`${docsDir}/`)) {
     rel = homepage.slice(docsDir.length + 1)
@@ -216,8 +219,12 @@ export async function resolveHomeRoute(config: DocsConfig) {
   }
   if (!rel) rel = 'README.md'
   const htmlPath = htmlPathFromSource(rel)
-  if (htmlPath.toLowerCase() === 'readme.html') return '/post'
-  return `/post/${encodeDocsPathForRoute(htmlPath)}`
+  try {
+    const index = await getDocsIndex()
+    const found = index.files.find((f) => f.path.toLowerCase() === htmlPath.toLowerCase())
+    if (found?.id) return `/post/${encodeURIComponent(found.id)}`
+  } catch {}
+  return '/404'
 }
 
 export async function getDocsIndex(opts?: { force?: boolean }) {

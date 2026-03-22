@@ -2,6 +2,7 @@
  * 路由配置与导航守卫：处理首页重定向、缺失目录告警页面切换，并在切换文章时重置滚动位置
  */
 import { createRouter, createWebHistory } from 'vue-router'
+import IndexPage from '@views/Index.vue'
 import DocsPage from '@views/DocsPage.vue'
 import WarningPage from '@views/WarningPage.vue'
 import NotFoundPage from '@views/NotFoundPage.vue'
@@ -50,7 +51,7 @@ const router = createRouter({
   routes: [
     { path: '/warning', name: 'warning', component: WarningPage },
     { path: '/404', name: 'not-found', component: NotFoundPage },
-    { path: '/', name: 'home', component: DocsPage },
+    { path: '/', name: 'index', component: IndexPage },
     { path: '/post/:pathMatch(.*)*', name: 'post', component: DocsPage },
     { path: '/:pathMatch(.*)*', redirect: '/404' },
   ],
@@ -60,14 +61,15 @@ router.beforeEach(async (to) => {
   if (to.name === 'warning') {
     try {
       const index = await getDocsIndex()
-      if (!index.missingRoot) return { path: '/', replace: true }
+      if (!index.missingRoot) {
+        const config = await getDocsConfig()
+        const homePath = await resolveHomeRoute(config)
+        return { path: homePath, replace: true }
+      }
     } catch {}
     return true
   }
-  if (to.path !== '/') return true
-  const config = await getDocsConfig()
-  const homePath = await resolveHomeRoute(config)
-  return { path: homePath, replace: true }
+  return true
 })
 
 export default router
