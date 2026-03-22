@@ -35,7 +35,7 @@ export function createRouterLinkBinder(router: Router) {
         return
       }
       if (url.origin !== window.location.origin) return
-      if (!url.pathname.startsWith('/post')) return
+      if (!url.pathname.startsWith('/docs')) return
 
       ev.preventDefault()
       void router.push(url.pathname + url.search + url.hash)
@@ -51,4 +51,3 @@ export function createRouterLinkBinder(router: Router) {
 
   return { bind, cleanup }
 }
-

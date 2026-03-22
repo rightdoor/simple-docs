@@ -171,7 +171,7 @@ export function docsFsPlugin(): Plugin {
       items.push({
         id: f.id,
         title,
-        link: baseUrl ? `${baseUrl}/post/${encodeURIComponent(f.id)}` : `/post/${encodeURIComponent(f.id)}`,
+        link: baseUrl ? `${baseUrl}/docs/${encodeURIComponent(f.id)}` : `/docs/${encodeURIComponent(f.id)}`,
         description,
         content: contentText,
         pubDate,

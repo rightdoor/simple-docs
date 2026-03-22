@@ -23,10 +23,10 @@ export async function buildDocsBundle(opts: {
   const { config, docsConfig, docsRoot } = opts
   const baseUrl = (docsConfig.url || '').trim().replace(/\/+$/, '')
   const outDir = path.resolve(config.root, config.build.outDir)
-  const outPostsRoot = path.join(outDir, 'posts')
+  const outDocsRoot = path.join(outDir, '_docs')
   const outAssetsRoot = path.join(outDir, 'assets')
   const outRssPath = path.join(outDir, 'rss.xml')
-  await fs.mkdir(outPostsRoot, { recursive: true })
+  await fs.mkdir(outDocsRoot, { recursive: true })
   await fs.mkdir(outAssetsRoot, { recursive: true })
   const legacyDocsAssetsRoot = path.join(outAssetsRoot, 'docs')
   await fs.rm(legacyDocsAssetsRoot, { recursive: true, force: true })
@@ -120,7 +120,7 @@ export async function buildDocsBundle(opts: {
       return {
         id: p.file.id,
         title,
-        link: baseUrl ? `${baseUrl}/post/${encodeURIComponent(p.file.id)}` : `/post/${encodeURIComponent(p.file.id)}`,
+        link: baseUrl ? `${baseUrl}/docs/${encodeURIComponent(p.file.id)}` : `/docs/${encodeURIComponent(p.file.id)}`,
         description,
         content: contentText,
         pubDate,
@@ -160,7 +160,7 @@ export async function buildDocsBundle(opts: {
 
   const tasks = pages.map((page) => async () => {
     const html = await compileMarkdownToHtmlFragment(page.text, page.mdPath, idByPath, '/assets/', docsConfig.language, assetMap)
-    const outFile = path.resolve(outPostsRoot, page.file.id, 'index.html')
+    const outFile = path.resolve(outDocsRoot, page.file.id, 'index.html')
     await fs.mkdir(path.dirname(outFile), { recursive: true })
     await fs.writeFile(outFile, html, 'utf8')
   })

@@ -24,7 +24,7 @@ export function useSidebarNav() {
       router.push('/404')
       return
     }
-    router.push(`/post/${encodeURIComponent(id)}`)
+    router.push(`/docs/${encodeURIComponent(id)}`)
   }
 
   const activePath = ref('README.html')

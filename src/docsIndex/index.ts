@@ -209,7 +209,7 @@ export async function resolveHomeRoute(config: DocsConfig) {
   const docsDir = normalizePathForCompare(config.docsDirectory)
   const homepage = normalizeFilePath(config.homepage)
   if (homepage && !homepage.includes('/') && !homepage.includes('.')) {
-    return `/post/${encodeURIComponent(homepage)}`
+    return `/docs/${encodeURIComponent(homepage)}`
   }
   let rel = homepage
   if (docsDir && homepage.startsWith(`${docsDir}/`)) {
@@ -222,7 +222,7 @@ export async function resolveHomeRoute(config: DocsConfig) {
   try {
     const index = await getDocsIndex()
     const found = index.files.find((f) => f.path.toLowerCase() === htmlPath.toLowerCase())
-    if (found?.id) return `/post/${encodeURIComponent(found.id)}`
+    if (found?.id) return `/docs/${encodeURIComponent(found.id)}`
   } catch {}
   return '/404'
 }
@@ -254,7 +254,7 @@ if (import.meta.hot) {
 export async function loadDocsHtml(docsHtmlPath: string, opts?: { signal?: AbortSignal }) {
   const signal = opts?.signal
   if (import.meta.env.DEV) {
-    const res = await fetch(`/docs/${docsHtmlPath}`, { cache: 'no-store', signal })
+    const res = await fetch(`/_docs/${docsHtmlPath}`, { cache: 'no-store', signal })
     if (!res.ok) throw new Error(tGlobal('error.docNotFound', { path: docsHtmlPath }))
     return await res.text()
   }
@@ -266,7 +266,7 @@ export async function loadDocsHtml(docsHtmlPath: string, opts?: { signal?: Abort
     id = found?.id
   } catch {}
 
-  const url = id ? `/posts/${id}/index.html` : `/docs/${docsHtmlPath}`
+  const url = id ? `/_docs/${encodeURIComponent(id)}/index.html` : '/404'
   const res = await fetch(url, { cache: 'no-store', signal })
   if (!res.ok) throw new Error(tGlobal('error.docNotFound', { path: docsHtmlPath }))
   return await res.text()

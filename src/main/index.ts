@@ -60,7 +60,7 @@ const mathjaxReady = (async () => {
 
 function stripPostHashOnBoot() {
   if (!location.hash) return
-  if (!location.pathname.startsWith('/post/')) return
+  if (!location.pathname.startsWith('/docs/')) return
   history.replaceState(history.state, '', location.pathname + location.search)
 }
 

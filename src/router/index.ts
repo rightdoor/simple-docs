@@ -52,7 +52,7 @@ const router = createRouter({
     { path: '/warning', name: 'warning', component: WarningPage },
     { path: '/404', name: 'not-found', component: NotFoundPage },
     { path: '/', name: 'index', component: IndexPage },
-    { path: '/post/:pathMatch(.*)*', name: 'post', component: DocsPage },
+    { path: '/docs/:pathMatch(.*)*', name: 'docs', component: DocsPage },
     { path: '/:pathMatch(.*)*', redirect: '/404' },
   ],
 })

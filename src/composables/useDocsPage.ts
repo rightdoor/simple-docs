@@ -105,13 +105,13 @@ export function useDocsPage() {
   function goPrevDoc() {
     const p = prevDoc.value
     if (!p) return
-    router.push(`/post/${encodeURIComponent(p.id)}`)
+    router.push(`/docs/${encodeURIComponent(p.id)}`)
   }
 
   function goNextDoc() {
     const n = nextDoc.value
     if (!n) return
-    router.push(`/post/${encodeURIComponent(n.id)}`)
+    router.push(`/docs/${encodeURIComponent(n.id)}`)
   }
 
   function renderContent(container: HTMLElement, dispatchRendered: boolean) {

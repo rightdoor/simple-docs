@@ -52,7 +52,7 @@ export function createSearchManager(opts: {
   }
 
   function selectSearchResult(result: SearchResult) {
-    router.push(`/post/${result.id}`)
+    router.push(`/docs/${result.id}`)
     closeSearch()
   }
 

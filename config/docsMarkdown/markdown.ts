@@ -7,7 +7,7 @@ import MarkdownIt from 'markdown-it'
 import Prism from 'prismjs'
 import { ensureFrontmatterId, parseFrontmatter } from './frontmatter'
 import { tConfig } from './locale'
-import { encodePathSegments, encodeRoutePath, markdownPathToHtmlPath, normalizeAssetBase, resolvePath, splitPathSuffix } from './paths'
+import { encodePathSegments, markdownPathToHtmlPath, normalizeAssetBase, resolvePath, splitPathSuffix } from './paths'
 
 import 'prismjs/components/prism-markup'
 import 'prismjs/components/prism-clike'
@@ -89,8 +89,8 @@ function resolveDocLinkHref(href: string, mdPath: string, idByPath: Map<string, 
   const resolved = resolvePath(mdDir, decodedBase)
   const htmlPath = /\.html$/i.test(resolved) ? resolved : markdownPathToHtmlPath(resolved)
   const id = idByPath.get(htmlPath)
-  if (id) return `/post/${id}${suffix}`
-  return `/post/${encodeRoutePath(htmlPath)}${suffix}`
+  if (id) return `/docs/${id}${suffix}`
+  return href
 }
 
 function resolveMarkdownItPlugin(moduleValue: unknown, preferredExport?: string): MarkdownItPlugin {

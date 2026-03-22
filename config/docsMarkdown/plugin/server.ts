@@ -1,5 +1,5 @@
 /**
- * Dev Server 中间件：提供 /docs/* 资源读取与 .md/.markdown 即时编译，并发布 HMR 变更事件
+ * Dev Server 中间件：提供 /_docs/* 资源读取与 .md/.markdown 即时编译，并发布 HMR 变更事件
  */
 import path from 'node:path'
 import { createReadStream, promises as fs } from 'node:fs'
@@ -67,7 +67,7 @@ export function attachDocsServer(server: ViteDevServer, opts: {
       return
     }
 
-    if (!u.pathname.startsWith('/docs/')) return next()
+    if (!u.pathname.startsWith('/_docs/')) return next()
 
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       res.statusCode = 405
@@ -75,7 +75,7 @@ export function attachDocsServer(server: ViteDevServer, opts: {
       return
     }
 
-    let relPath = u.pathname.slice('/docs/'.length)
+    let relPath = u.pathname.slice('/_docs/'.length)
     try {
       relPath = decodeURIComponent(relPath)
     } catch {
@@ -129,7 +129,7 @@ export function attachDocsServer(server: ViteDevServer, opts: {
         const mdPathForRewrite = toPosix(path.relative(docsAbs, sourcePath))
         const index = await ensureIndex()
         const idByPath = buildIdMap(index)
-        const html = await compileMarkdownToHtmlFragment(text, mdPathForRewrite, idByPath, '/docs/', docsConfig.language)
+        const html = await compileMarkdownToHtmlFragment(text, mdPathForRewrite, idByPath, '/_docs/', docsConfig.language)
         res.end(html)
       } catch {
         res.statusCode = 500
