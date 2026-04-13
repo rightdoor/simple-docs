@@ -729,6 +729,13 @@
 .markdown-body .mermaid {
   margin: 16px 0;
   overflow: auto;
+  transition: opacity 0.2s ease;
+  min-height: 20px;
+}
+
+.markdown-body .mermaid.is-rendering {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .markdown-body .md-toc {
@@ -811,9 +818,4 @@
 /* 解决脚注分隔线与内容样式不一致问题 */
 .markdown-body hr.footnotes-sep {
   display: none;
-}
-
-/* 暗色主题下，mermaid 图表背景设为白色，避免暗色主题下图表元素看不清 */
-[data-theme='dark'] .markdown-body .mermaid svg {
-  background-color: #ffffff;
 }

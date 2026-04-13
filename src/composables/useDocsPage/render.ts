@@ -5,8 +5,9 @@ import mermaid from 'mermaid'
 import { Chart } from 'chart.js/auto'
 
 export function createContentRenderers() {
-  let mermaidReady = false
   const chartInstances = new WeakMap<HTMLCanvasElement, Chart<any, any, any>>()
+  let isMermaidRendering = false
+  let pendingMermaidRender = false
 
   function typesetMath(container: HTMLElement) {
     const mathjax = (window as Window & {
@@ -17,20 +18,27 @@ export function createContentRenderers() {
     void mathjax.typesetPromise([container])
   }
 
-  function renderMermaid(container: HTMLElement) {
+  async function renderMermaid(container: HTMLElement) {
     const nodes = Array.from(container.querySelectorAll('.mermaid')) as HTMLElement[]
     if (!nodes.length) return
-    nodes.forEach((node) => {
-      const raw = (node.textContent ?? '').replace(/<br\s*\/?>/gi, '<br/>')
-      if (raw !== (node.textContent ?? '')) node.textContent = raw
-    })
-    if (!mermaidReady) {
-      mermaid.initialize({ startOnLoad: false })
-      mermaidReady = true
+
+    if (isMermaidRendering) {
+      pendingMermaidRender = true
+      return
     }
+    isMermaidRendering = true
+    pendingMermaidRender = false
+
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'base'
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme,
+    })
+
     const api = mermaid as unknown as {
+      render?: (id: string, text: string, container?: Element) => Promise<{ svg: string }>
       run?: (opts: { nodes: Element[] }) => Promise<void>
-      init?: (config: unknown, nodes: Element[]) => Promise<void>
     }
 
     const warn = console.warn
@@ -45,19 +53,50 @@ export function createContentRenderers() {
       warn(...args)
     }
 
-    if (api.run) {
-      void api.run({ nodes }).finally(() => {
-        console.warn = warn
-      })
-      return
+    try {
+      if (api.render) {
+        for (let i = 0; i < nodes.length; i++) {
+          const node = nodes[i]
+          const code = node.getAttribute('data-code') || node.textContent || ''
+          const raw = code.replace(/<br\s*\/?>/gi, '\n') // render expects normal line breaks
+          const id = `mermaid-render-${Math.random().toString(36).substring(2, 9)}`
+
+          // 保持容器高度，减少抖动
+          const rect = node.getBoundingClientRect()
+          if (rect.height > 0) {
+            node.style.minHeight = `${rect.height}px`
+          }
+          node.classList.add('is-rendering')
+
+          try {
+            const { svg } = await api.render(id, raw, node)
+            node.innerHTML = svg
+          } catch (e) {
+            console.error('Mermaid render error:', e)
+          } finally {
+            node.classList.remove('is-rendering')
+            node.style.minHeight = ''
+          }
+        }
+      } else if (api.run) {
+        nodes.forEach((node) => {
+          const code = node.getAttribute('data-code') || node.textContent || ''
+          const raw = code.replace(/<br\s*\/?>/gi, '<br/>')
+          if (node.textContent !== raw || node.querySelector('svg')) {
+            node.innerHTML = raw
+          }
+        })
+        await api.run({ nodes })
+      }
+    } catch (e) {
+      console.error('Mermaid rendering failed:', e)
+    } finally {
+      console.warn = warn
+      isMermaidRendering = false
+      if (pendingMermaidRender) {
+        void renderMermaid(container)
+      }
     }
-    if (api.init) {
-      void api.init(undefined, nodes).finally(() => {
-        console.warn = warn
-      })
-      return
-    }
-    console.warn = warn
   }
 
   function renderCharts(container: HTMLElement) {

@@ -357,7 +357,7 @@ export async function compileMarkdownToHtmlFragment(
     const info = String(token?.info || '').trim().toLowerCase()
     if (info === 'mermaid') {
       const code = String(token?.content || '')
-      return `<div class="mermaid">${escapeHtml(code)}</div>`
+      return `<div class="mermaid" data-code="${escapeHtml(code)}">${escapeHtml(code)}</div>`
     }
     return defaultFence(tokens, idx, options, env, self)
   }

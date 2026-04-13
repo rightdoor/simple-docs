@@ -25,6 +25,7 @@ export function createThemeManager() {
   function applyTheme(value: DocsTheme) {
     const resolved = resolveThemeValue(value)
     document.documentElement.setAttribute('data-theme', resolved)
+    window.dispatchEvent(new Event('theme-changed'))
   }
 
   function onSystemThemeChange() {

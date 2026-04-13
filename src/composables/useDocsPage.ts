@@ -299,9 +299,16 @@ export function useDocsPage() {
     tocTracker.updateActiveOnScroll()
   }
 
+  function onThemeChange() {
+    if (mdContainer.value) {
+      renderers.renderMermaid(mdContainer.value)
+    }
+  }
+
   onMounted(() => {
     loadHtml()
     window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('theme-changed', onThemeChange)
     stopDocsListener = onDocsUpdate((ev) => {
       renderCache.delete(ev.path)
       if (ev.path === currentDocsPath.value) {
@@ -320,6 +327,7 @@ export function useDocsPage() {
   onBeforeUnmount(() => {
     currentAbort?.abort()
     window.removeEventListener('scroll', onScroll)
+    window.removeEventListener('theme-changed', onThemeChange)
     toc?.setItems([])
     stopDocsListener?.()
     stopDocsListener = null
