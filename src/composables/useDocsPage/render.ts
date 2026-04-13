@@ -55,8 +55,7 @@ export function createContentRenderers() {
 
     try {
       if (api.render) {
-        for (let i = 0; i < nodes.length; i++) {
-          const node = nodes[i]
+        for (const node of nodes) {
           const code = node.getAttribute('data-code') || node.textContent || ''
           const raw = code.replace(/<br\s*\/?>/gi, '\n') // render expects normal line breaks
           const id = `mermaid-render-${Math.random().toString(36).substring(2, 9)}`
